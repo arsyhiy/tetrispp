@@ -194,11 +194,16 @@ main()
 #include <iostream>
 #include <unistd.h>
 
+extern int shapes[7][4][4][4];
+static const int FIELD_H = 20; // высота
+static const int FIELD_W = 10; // ширина
+static int field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+
+
 
 // function prototypes
 int handle_input();
 int update_game();
-
 
 class Render
 {
@@ -207,77 +212,124 @@ class Render
 private:
 
   // width height.
-  int Field[10][20] = {0}; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+  //int Field[10][20] = {0}; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
 
-  struct Tetromino {
-    int shapes[4][4][4]; // [type][rotate][y][x].
-
-    // we see all via this variable
-    char c='.';
-  };
-  // mind it must be static but now i dont now where it belongs those variables.
-  int tetra_y, tetra_x;
+  //struct Tetromino {
+  //  int shapes[4][4][4][4]; // [type][rotate][y][x].
+  //};
 
 public:
 
-  int drawfiled(){
-    /*
-      прочитать  field его weight и height если значние 0 вывести точку если нет открытую и закрутю квадатруню скобку.
-      обновлять не надо только вывести содержимок двумерного масива.
-      все через for loop
-    */
-
-  //  const int i = 3, j = 3;
-  //  Declaring array
-  //  int arr[i][j] = {{1, 2, 3},
-  //                   {4, 5, 6},
-  //                   {7, 8, 9}};
-    for(int a = 0; a <= 20 ; a++)
-      {
-        for(int b = 0; b < 10; b++)
-          {
-            std::cout << Field[b][a] << " " ;
-          }
-          std::cout << "\n";
-            
-        
-      }  
-      return 0;
-
-      /*
-        TODO: выяснить почему мы получаем мусорные значения пример:
-        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1761631680 32767 -1344782336 -1658579803 -1761631632 32767 287471157 32619 8 0 -1761631496 32767 0 1 -858889879 22008 0 0 -1516489478 430379038 %
-        
-      */
-
-    
+   //struct Tetromino {
+    //   int shapes[4][4][4][4]; // [type][rotate][y][x].
+    // };
+  //Tetromino t;;
+  struct ActiveTetromino {
+    int type;
+    int rotation;
+    int x;
+    int y;
   };
-  
-  void drawtetromino(const Tetromino& tetromino){ // i dont sure  we need it const
-    /*
-      вывести фигуру, rotate и ее кординаты на поле. обновлять не надо как и поле
-      все происходит через for loop
-    */
-    std::cout <<" "<< tetromino.shapes;
+  ActiveTetromino t;
 
-  };
-    
-  
+  /*int drawfiled(){*/
+  /**/
+  /*  for(int a = 0; a < 20 ; a++)*/
+  /*    {*/
+  /*      for(int b = 0; b < 10; b++)*/
+  /*        {*/
+  /*          std::cout << Field[b][a] << " " ;*/
+  /*        }*/
+  /*        std::cout << "\n";*/
+  /*    }  */
+  /*    return 0;*/
+  /*};*/
+  /**/
+  /*void drawtetromino(){ // i dont sure  we need it const*/
+  /**/
+  /*  Tetromino t = {*/
+  /*    {*/
+  /*      {   // type 0*/
+  /*        {   // rotate 0*/
+  /*          {0,0,0,0},*/
+  /*          {1,1,1,1},*/
+  /*          {0,0,0,0},*/
+  /*          {0,0,0,0}*/
+  /*        },*/
+  /*        {   // rotate 1*/
+  /*          {0,0,1,0},*/
+  /*          {0,0,1,0},*/
+  /*          {0,0,1,0},*/
+  /*          {0,0,1,0}*/
+  /*        },*/
+  /*        {0}, // rotate 2*/
+  /*        {0}  // rotate 3*/
+  /*      },*/
+  /*      {0}, {0}, {0} // остальные типы*/
+  /*    }*/
+  /*  };*/
+  /*  int type = 0;*/
+  /*  int rot  = 0;*/
+  /**/
+  /*  for (int y = 0; y < 4; y++) {*/
+  /*      for (int x = 0; x < 4; x++) {*/
+  /*          std::cout << (t.shapes[type][rot][y][x] ? "[]" : ".");*/
+  /*      }*/
+  /*      std::cout << '\n';*/
+  /*  };*/
+  /*};*/
+
+int shapes[7][4][4][4] = {
+    // I-тетромино
+    {
+        { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+        { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} },
+        { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+        { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} }
+    },
+    // остальные 6 фигур
+};
 
   // draw field and tetromino
-  void draw(){
-    /*
-      вывести поле и тетромино вместе 
-      вывести в for loop а перед этим очистить tetromino и field
-    */
-    //bool render_is_running = true;
-    //while (render_is_running == true) {
-      //drawfiled();
-     
-      //};
-    drawfiled(); // thats a temporary line 
+void draw() {
+    for (int fy = 0; fy < FIELD_H; fy++) {
+        for (int fx = 0; fx < FIELD_W; fx++) {
 
-  };
+            // Рисуем "стены" поля
+            if (fx == 0 || fx == FIELD_W - 1 || fy == FIELD_H - 1) {
+                std::cout << "!";
+                continue;
+            }
+
+            // Проверяем, есть ли блок в статическом поле
+            if (field[fy][fx]) {
+                std::cout << "[]";
+                continue;
+            }
+
+            // Проверяем, есть ли активное тетромино в этой позиции
+            bool drawn = false;
+            for (int ty = 0; ty < 4 && !drawn; ty++) {
+                for (int tx = 0; tx < 4 && !drawn; tx++) {
+                    if (shapes[t.type][t.rotation][ty][tx]) {
+                        int world_x = t.x + tx;
+                        int world_y = t.y + ty;
+                        if (world_x == fx && world_y == fy) {
+                            std::cout << "[]";
+                            drawn = true;
+                        }
+                    }
+
+                }
+            }
+
+            // Если ничего не нарисовали, оставляем пустое место
+            if (!drawn)
+                std::cout << "  ";
+        }
+        std::cout << '\n';
+    }
+};
 };
 
 

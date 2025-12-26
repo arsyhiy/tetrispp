@@ -193,6 +193,7 @@ main()
 
 #include <iostream>
 #include <unistd.h>
+#include <cstdlib>
 
 extern int shapes[7][4][4][4];
 static const int FIELD_H = 20; // высота
@@ -203,7 +204,10 @@ static int field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 
 
 // function prototypes
 int handle_input();
-int update_game();
+void update_game(){
+  system("clear");   // Linux / macOS
+  
+};
 
 class Render
 {
@@ -346,13 +350,11 @@ int main(){
   
   while (game_is_running == true){
     //handle_input();
-    //update_game();
+    update_game();
     Render render;
-    //render.draw();
-    //sleep(frame_time); // must be a int variable i need to investigate that
     render.draw();
+    //sleep(frame_time); // must be a int variable i need to investigate that
     sleep(1); // that is for testing only
-    game_is_running = false;
       };
   };
 

@@ -349,19 +349,29 @@ public:
     for (int fy = 0; fy < FIELD_H; fy++) {
       for (int fx = 0; fx < FIELD_W; fx++) {
 
-        // Рисуем "стены" поля
-        if (fx == 0 || fx == FIELD_W - 1 || fy == FIELD_H - 1) {
-          std::cout << "!";
+        // draw left wall
+        if (fx == 0) {
+          std::cout << "<!"; 
           continue;
         }
-
-        // Проверяем, есть ли блок в статическом поле
+        // draw right wall
+        if (fx == FIELD_W - 1) {
+          std::cout << "!>";
+          continue;
+        }       
+        // draw the ground
+        if (fy == FIELD_H - 1) {
+          std::cout << "==";
+          continue;
+        } 
+        
+        // check if there is the block 
         if (field[fy][fx]) {
           std::cout << "[]";
           continue;
         }
 
-        // Проверяем, есть ли активное тетромино в этой позиции
+        // check if there is tetromino in current location
         bool drawn = false;
         for (int ty = 0; ty < 4 && !drawn; ty++) {
           for (int tx = 0; tx < 4 && !drawn; tx++) {
@@ -376,9 +386,9 @@ public:
           }
         }
 
-        // Если ничего не нарисовали, оставляем пустое место
+        // if there is empty space draw ..
         if (!drawn)
-          std::cout << "  ";
+          std::cout << "..";
       }
       std::cout << '\n';
     }

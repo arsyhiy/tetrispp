@@ -412,14 +412,7 @@ public:
 
 private:
 
-  // width height.
-  //int Field[10][20] = {0}; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
-
-  //struct Tetromino {
-  //  int shapes[4][4][4][4]; // [type][rotate][y][x].
-  //};
-
-};
+ };
 
 
 int main(){

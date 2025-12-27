@@ -198,6 +198,8 @@ main()
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <termios.h>
+#include <fcntl.h>
 
 // static variables
 
@@ -221,14 +223,61 @@ struct ActiveTetromino {
 ActiveTetromino t;
 
 
-int handle_input(){
-  
-  return 0;
+
+
+
+
+const int shapes[7][4][4][4] = {
+  // stick 
+  {
+    { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+    { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} },
+    { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+    { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} }
+  },
+  // остальные 6 фигур
+};
+
+bool kbhit() {
+    struct termios oldt, newt;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldt);          // Сохраняем старые параметры терминала
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);         // Отключаем каноничный режим и эхо
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt); // Применяем новые настройки
+
+    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK); // Ожидание без блокировки
+    ch = getchar();                          // Пытаемся получить символ
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // Восстанавливаем старые параметры терминала
+
+    if(ch != EOF) {  // Если символ был считан
+        ungetc(ch, stdin);  // Возвращаем символ в буфер ввода
+        return true;         // Нажата клавиша
+    }
+
+    return false;  // Нет нажатой клавиши
+
+}
+
+
+
+// rewrite it case switch statements
+void handle_input(){
+  if (kbhit()) {
+    char input = getchar();  // Считываем нажатую клавишу
+    if (input == 'q'){
+      std::cout << " exiting";
+      game_is_running = false;
+      system("clear");
+    };
+  }
 };
 
 void update_game(){
   
 };
+
 
 
 class Render
@@ -294,16 +343,6 @@ public:
   /*  };*/
   /*};*/
 
-  int shapes[7][4][4][4] = {
-    // I-тетромино
-    {
-      { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
-      { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} },
-      { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
-      { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} }
-    },
-    // остальные 6 фигур
-  };
 
   // draw field and tetromino
   void draw_frame() {
@@ -346,7 +385,8 @@ public:
   };
 
   void clear_screen(){
-    std::cout << "\033[H\033[2J";
+    std::cout << "\033[H\033[2J" ;
+
   };
 
   void sleep_ms(int ms) {
@@ -375,11 +415,20 @@ private:
 int main(){
 
   Render render;
+ 
+  // entering alt buffer
+  std::cout << "\033[?1049h";
   
   while (game_is_running == true){
     handle_input();
     update_game();
     render.draw();
       };
+
+  // exeting alt buffer
+  std::cout << "\033[?1049l";
+
+  return 0;
+
   };
 

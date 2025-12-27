@@ -191,50 +191,61 @@ main()
 
 */
 
+
+
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
+#include <thread>
+#include <chrono>
 
-extern int shapes[7][4][4][4];
+// static variables
+
+// field
 static const int FIELD_H = 20; // высота
 static const int FIELD_W = 10; // ширина
-static int field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+int static field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+
+// maybe i need a more pretty name for this
+static bool game_is_running = true;
+
+//structs
+
+// tetromino
+struct ActiveTetromino {
+  int type;
+  int rotation;
+  int x;
+  int y;
+};
+ActiveTetromino t;
 
 
+int handle_input(){
+  
+  return 0;
+};
 
-// function prototypes
-int handle_input();
 void update_game(){
-  system("clear");   // Linux / macOS
   
 };
 
+
 class Render
 {
-  //draw field
-  //draw current_piece on top
-private:
-
-  // width height.
-  //int Field[10][20] = {0}; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
-
-  //struct Tetromino {
-  //  int shapes[4][4][4][4]; // [type][rotate][y][x].
-  //};
-
+  
 public:
-
    //struct Tetromino {
     //   int shapes[4][4][4][4]; // [type][rotate][y][x].
     // };
   //Tetromino t;;
-  struct ActiveTetromino {
-    int type;
-    int rotation;
-    int x;
-    int y;
-  };
-  ActiveTetromino t;
+  //  struct ActiveTetromino {
+  //  int type;
+  //  int rotation;
+  //  int x;
+  //  int y;
+  //};
+  //ActiveTetromino t;
 
   /*int drawfiled(){*/
   /**/
@@ -283,78 +294,92 @@ public:
   /*  };*/
   /*};*/
 
-int shapes[7][4][4][4] = {
+  int shapes[7][4][4][4] = {
     // I-тетромино
     {
-        { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
-        { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} },
-        { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
-        { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} }
+      { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+      { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} },
+      { {0,0,0,0}, {1,1,1,1}, {0,0,0,0}, {0,0,0,0} },
+      { {0,0,1,0}, {0,0,1,0}, {0,0,1,0}, {0,0,1,0} }
     },
     // остальные 6 фигур
-};
+  };
 
   // draw field and tetromino
-void draw() {
+  void draw_frame() {
     for (int fy = 0; fy < FIELD_H; fy++) {
-        for (int fx = 0; fx < FIELD_W; fx++) {
+      for (int fx = 0; fx < FIELD_W; fx++) {
 
-            // Рисуем "стены" поля
-            if (fx == 0 || fx == FIELD_W - 1 || fy == FIELD_H - 1) {
-                std::cout << "!";
-                continue;
-            }
-
-            // Проверяем, есть ли блок в статическом поле
-            if (field[fy][fx]) {
-                std::cout << "[]";
-                continue;
-            }
-
-            // Проверяем, есть ли активное тетромино в этой позиции
-            bool drawn = false;
-            for (int ty = 0; ty < 4 && !drawn; ty++) {
-                for (int tx = 0; tx < 4 && !drawn; tx++) {
-                    if (shapes[t.type][t.rotation][ty][tx]) {
-                        int world_x = t.x + tx;
-                        int world_y = t.y + ty;
-                        if (world_x == fx && world_y == fy) {
-                            std::cout << "[]";
-                            drawn = true;
-                        }
-                    }
-
-                }
-            }
-
-            // Если ничего не нарисовали, оставляем пустое место
-            if (!drawn)
-                std::cout << "  ";
+        // Рисуем "стены" поля
+        if (fx == 0 || fx == FIELD_W - 1 || fy == FIELD_H - 1) {
+          std::cout << "!";
+          continue;
         }
-        std::cout << '\n';
+
+        // Проверяем, есть ли блок в статическом поле
+        if (field[fy][fx]) {
+          std::cout << "[]";
+          continue;
+        }
+
+        // Проверяем, есть ли активное тетромино в этой позиции
+        bool drawn = false;
+        for (int ty = 0; ty < 4 && !drawn; ty++) {
+          for (int tx = 0; tx < 4 && !drawn; tx++) {
+            if (shapes[t.type][t.rotation][ty][tx]) {
+              int world_x = t.x + tx;
+              int world_y = t.y + ty;
+              if (world_x == fx && world_y == fy) {
+                std::cout << "[]";
+                drawn = true;
+              }
+            }
+          }
+        }
+
+        // Если ничего не нарисовали, оставляем пустое место
+        if (!drawn)
+          std::cout << "  ";
+      }
+      std::cout << '\n';
     }
+  };
+
+  void clear_screen(){
+    std::cout << "\033[H\033[2J";
+  };
+
+  void sleep_ms(int ms) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+  };
+  
+  void draw(){
+    clear_screen();
+    sleep_ms(16); // must be a int variable i need to investigate that. NOTE that is temporay version because is can get faster or slower by different cpu.
+    draw_frame();
+  };
+
+
+private:
+
+  // width height.
+  //int Field[10][20] = {0}; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+
+  //struct Tetromino {
+  //  int shapes[4][4][4][4]; // [type][rotate][y][x].
+  //};
+
 };
-};
-
-
-//void sleep(int frame_time);
-// variables
-//int frame_time;
-
 
 
 int main(){
 
-  // maybe i need a more pretty name for this
-  bool game_is_running = true;
+  Render render;
   
   while (game_is_running == true){
-    //handle_input();
+    handle_input();
     update_game();
-    Render render;
     render.draw();
-    //sleep(frame_time); // must be a int variable i need to investigate that
-    sleep(1); // that is for testing only
       };
   };
 

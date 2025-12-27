@@ -204,7 +204,7 @@ main()
 // field
 static const int FIELD_H = 20; // высота
 static const int FIELD_W = 10; // ширина
-int static field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
+static int field[FIELD_H][FIELD_W]; // NOTE: that he does not keep tetromino. 0 for empty 1 for full.
 
 // maybe i need a more pretty name for this
 static bool game_is_running = true;

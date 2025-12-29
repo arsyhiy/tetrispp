@@ -89,21 +89,21 @@ class Input{
 
 public:
 
-    // Функция для захвата символа с клавиатуры без ожидания Enter
+    // A function to capture a character from the keyboard without waiting for Enter
     char getch() {
 
         struct termios oldt, newt;
         char ch;
 
-        tcgetattr(STDIN_FILENO, &oldt);  // Получаем текущие настройки терминала
+        tcgetattr(STDIN_FILENO, &oldt);  // Getting the current terminal settings
         newt = oldt;
-        newt.c_lflag &= ~ICANON;  // Отключаем режим канонического ввода
-        newt.c_lflag &= ~ECHO;    // Отключаем эхо (не отображать введенный символ)
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // Применяем новые настройки
+        newt.c_lflag &= ~ICANON;  // Disabling canonical input mode
+        newt.c_lflag &= ~ECHO;    // Disable echo (do not display the entered character)
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // Applying new settings
     
-        ch = getchar();  // Читаем символ
+        ch = getchar();  // Reading the symbol
     
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Восстанавливаем старые настройки
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restoring old settings
         return ch;
 
     };
@@ -115,7 +115,7 @@ public:
         int ch;
         int oldf;
     
-        tcgetattr(STDIN_FILENO, &oldt);  // Получаем текущие настройки терминала
+        tcgetattr(STDIN_FILENO, &oldt);  // Getting the current terminal settings
         newt = oldt;
         newt.c_lflag &= ~ICANON;
         newt.c_lflag &= ~ECHO;
@@ -131,7 +131,7 @@ public:
         fcntl(STDIN_FILENO, F_SETFL, oldf);
     
         if(ch != EOF) {
-            ungetc(ch, stdin);  // Возвращаем символ в поток ввода
+            ungetc(ch, stdin);  // Return the character to the input stream
             return true;
         }
         return false;
@@ -151,13 +151,14 @@ public:
 
     bool can_move_down(const ActiveTetromino& t) {
 
-        // Проверяем, можем ли мы опустить тетромино вниз
+        // Let's check if we can move the tetromino down
         for (int ty = 0; ty < 4; ++ty) {
             for (int tx = 0; tx < 4; ++tx) {
-                // Если ячейка тетромино активна
+                // If the tetromino cell is active
                 if (shapes[t.type][t.rotation][ty][tx]) {
                     int world_x = t.x + tx;
-                    int world_y = t.y + ty + 1;  // Мы проверяем на 1 клетку ниже
+                    int world_y = t.y + ty + 1;  // We check 1 cell below
+
 
                     // Проверяем, не выходит ли за пределы поля или не сталкивается с другим блоком
                     if (world_y >= FIELD_H || (world_x >= 0 && world_x < FIELD_W && field[world_y][world_x])) {
@@ -192,7 +193,7 @@ public:
     // Функция для перемещения тетромино вправо
     void move_right(ActiveTetromino& t) {
 
-        // Проверяем, можем ли мы переместиться вправо
+        // We check if it goes out of bounds or collides with another block.
         for (int ty = 0; ty < 4; ++ty) {
             for (int tx = 0; tx < 4; ++tx) {
                 if (shapes[t.type][t.rotation][ty][tx]) {
@@ -200,20 +201,21 @@ public:
                     int world_y = t.y + ty;
 
                     if (world_x >= FIELD_W || (world_y >= 0 && world_y < FIELD_H && field[world_y][world_x])) {
-                        return;  // Не можем двигаться вправо
+                        return;  // We can't move to the right
                     }
                 }
             }
         }
 
-        t.x++;  // Перемещаем вправо
+        t.x++;  // Move to the right
     };
 
-    // Функция для вращения тетромино
+    // Function for rotating a tetromino
     void rotate(ActiveTetromino& t) {
 
         int new_rotation = (t.rotation + 1) % 4;
-        // Проверяем, можем ли мы повернуть тетромино
+        // Let's check if we can rotate the tetromino
+
         for (int ty = 0; ty < 4; ++ty) {
             for (int tx = 0; tx < 4; ++tx) {
                 if (shapes[t.type][new_rotation][ty][tx]) {
@@ -221,35 +223,36 @@ public:
                     int world_y = t.y + ty;
 
                     if (world_x < 0 || world_x >= FIELD_W || world_y >= FIELD_H || field[world_y][world_x]) {
-                        return;  // Не можем повернуть
+                        return;  // We can't turn
                     }
                 }
             }
         }
 
-        t.rotation = new_rotation;  // Осуществляем поворот
+        t.rotation = new_rotation;  // We are making a turn
     };
 
     void move_down(ActiveTetromino& t) {
 
-        // Проверяем, можем ли опустить тетромино вниз
+        // Let's check if we can move the tetromino down
         if (can_move_down(t)) {
-            t.y++;  // Если можем, сдвигаем тетромино на одну клетку вниз
+            t.y++;  // If we can, we move the tetromino down one square.
         } else {
-            // Если не можем, фиксируем тетромино в поле
+            // If we can't, we fix the tetromino in the field
             for (int ty = 0; ty < 4; ++ty) {
                 for (int tx = 0; tx < 4; ++tx) {
                     if (shapes[t.type][t.rotation][ty][tx]) {
                         int world_x = t.x + tx;
                         int world_y = t.y + ty;
                         if (world_y < FIELD_H) {
-                            field[world_y][world_x] = 1;  // Фиксируем блок на поле
+                            field[world_y][world_x] = 1;  // We fix the block on the field
+
                         }
                     }
                 }
             }
-            // Тетромино теперь не двигается, можно запускать следующее
-            t.y = -1;  // Устанавливаем специальное значение, чтобы сигнализировать, что тетромино зафиксировано
+            // Tetromino is no longer moving, you can launch the next one
+            t.y = -1;  // We set a special value to signal that the tetromino is locked
         }
     };
 
@@ -258,15 +261,15 @@ public:
         if (kbhit()) {
             char input = getch();
 
-            if (input == 27) {  // ESC для выхода
+            if (input == 27) {  // ESC for exit
                 game_is_running = false;
-            } else if (input == 'a' || input == 'A') {  // Влево
+            } else if (input == 'a' || input == 'A') {  // left
                 move_left(t);
-            } else if (input == 'd' || input == 'D') {  // Вправо
+            } else if (input == 'd' || input == 'D') {  // right
                 move_right(t);
-            } else if (input == 's' || input == 'S') {  // Вниз
+            } else if (input == 's' || input == 'S') {  // down
                 move_down(t);
-            } else if (input == 'w' || input == 'W') {  // Поворот
+            } else if (input == 'w' || input == 'W') {  // rotate
                 rotate(t);
             }
         }

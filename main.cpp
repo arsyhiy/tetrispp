@@ -271,11 +271,18 @@ public:
     };
 };
 
-void update_game(){
+class Game
+{
 
-  Input input;
-  input.move_down(t);
+    public:
+        void update_game(){
+            Input input;
+            input.move_down(t); // i think move_down most be a update_game Function.
+            // we need colishion
+        };
+
 };
+
 
 class Render
 {
@@ -416,6 +423,7 @@ int main(){
 
   Render render;
   Input input;
+  Game game; 
 
   // Сохраняем старое состояние терминала
   TerminalState oldState = saveTerminal();
@@ -428,7 +436,7 @@ int main(){
 
   while (game_is_running == true){
     input.handle_input();
-    update_game();
+    game.update_game();
     render.draw();
       };
 
@@ -437,7 +445,7 @@ int main(){
   // exeting alt buffer
   std::cout << "\033[?1049l";
   // show cursor again
-  //std::cout << "\033[?25h"; 
+  std::cout << "\033[?25h"; 
   // enableEcho();
 
   return 0;

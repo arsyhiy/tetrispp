@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
@@ -18,14 +19,13 @@ static bool game_is_running = true;
 
 //structs
 
-// tetromino
-struct ActiveTetromino {
+struct Tetromino {
   int type;
   int rotation;
   int x;
   int y;
 };
-ActiveTetromino t = {0, 0, FIELD_W / 2, 0};
+Tetromino t = {0, 0, FIELD_W / 2, 0}; // make it random 
 
 const int shapes[7][4][4][4] = {
     // I-тип
@@ -85,51 +85,58 @@ const int shapes[7][4][4][4] = {
 
 
 
+
+// Функция для отключения отображения символов при вводе
+void disableEcho() {
+    struct termios settings;
+    tcgetattr(STDIN_FILENO, &settings);
+    settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
+    tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+}
+
+// Функция для включения отображения символов
+void enableEcho() {
+    struct termios settings;
+    tcgetattr(STDIN_FILENO, &settings);
+    settings.c_lflag |= ECHO;  // Включаем отображение символов
+    tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+}
+
+
+struct TerminalState {
+    termios settings;
+};
+
+// Сохраняем состояние терминала
+TerminalState saveTerminal() {
+    TerminalState state;
+    tcgetattr(STDIN_FILENO, &state.settings);
+    return state;
+}
+// Восстанавливаем состояние терминала
+void restoreTerminal(const TerminalState &state) {
+    tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
+}
+
 class Input{
 
 public:
 
-    // A function to capture a character from the keyboard without waiting for Enter
-    char getch() {
-
-        struct termios oldt, newt;
-        char ch;
-
-        tcgetattr(STDIN_FILENO, &oldt);  // Getting the current terminal settings
-        newt = oldt;
-        newt.c_lflag &= ~ICANON;  // Disabling canonical input mode
-        newt.c_lflag &= ~ECHO;    // Disable echo (do not display the entered character)
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);  // Applying new settings
-    
-        ch = getchar();  // Reading the symbol
-    
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restoring old settings
-        return ch;
-
-    };
-
     bool kbhit() {
 
-        struct termios oldt;
-        struct termios newt;
-        int ch;
-        int oldf;
+        struct termios settings;
+        int ch, stdinFlags; // make sure input is a good naming
     
-        tcgetattr(STDIN_FILENO, &oldt);  // Getting the current terminal settings
-        newt = oldt;
-        newt.c_lflag &= ~ICANON;
-        newt.c_lflag &= ~ECHO;
-        newt.c_cc[VMIN] = 1;
-        newt.c_cc[VTIME] = 0;
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-        oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-        fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+        tcgetattr(STDIN_FILENO, &settings);  // Getting the current terminal settings
+        settings.c_lflag &= ~ICANON; //Disable canonical mode (input is available immediately, without waiting for Enter)
+        settings.c_cc[VMIN] = 1; // Require at least 1 character to return from read// Require at least 1 character to return from read
+        settings.c_cc[VTIME] = 0; // No timeout
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings); // setting new terminal settings
+        stdinFlags = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL,  stdinFlags | O_NONBLOCK);
     
         ch = getchar();
-    
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-        fcntl(STDIN_FILENO, F_SETFL, oldf);
-    
+
         if(ch != EOF) {
             ungetc(ch, stdin);  // Return the character to the input stream
             return true;
@@ -137,19 +144,7 @@ public:
         return false;
     };
 
-    // rewrite it case switch statements
-    //void handle_input(){
-    //if (kbhit()) {
-    //char input = getchar();  // Считываем нажатую клавишу
-    //if (input == 'q'){
-    // std::cout << " exiting";
-    // game_is_running = false;
-    // system("clear");
-    //    };
-    //  }
-    //};
-
-    bool can_move_down(const ActiveTetromino& t) {
+    bool can_move_down(const Tetromino& t) {
 
         // Let's check if we can move the tetromino down
         for (int ty = 0; ty < 4; ++ty) {
@@ -171,7 +166,7 @@ public:
     };
 
     // Функция для перемещения тетромино влево/вправ
-    void move_left(ActiveTetromino& t) {
+    void move_left(Tetromino& t) {
 
         // Проверяем, можем ли мы переместиться влево
         for (int ty = 0; ty < 4; ++ty) {
@@ -191,7 +186,7 @@ public:
     };
 
     // Функция для перемещения тетромино вправо
-    void move_right(ActiveTetromino& t) {
+    void move_right(Tetromino& t) {
 
         // We check if it goes out of bounds or collides with another block.
         for (int ty = 0; ty < 4; ++ty) {
@@ -211,7 +206,7 @@ public:
     };
 
     // Function for rotating a tetromino
-    void rotate(ActiveTetromino& t) {
+    void rotate(Tetromino& t) {
 
         int new_rotation = (t.rotation + 1) % 4;
         // Let's check if we can rotate the tetromino
@@ -232,7 +227,7 @@ public:
         t.rotation = new_rotation;  // We are making a turn
     };
 
-    void move_down(ActiveTetromino& t) {
+    void move_down(Tetromino& t) {
 
         // Let's check if we can move the tetromino down
         if (can_move_down(t)) {
@@ -259,7 +254,7 @@ public:
     void handle_input() {
 
         if (kbhit()) {
-            char input = getch();
+            char input = getchar();
 
             if (input == 27) {  // ESC for exit
                 game_is_running = false;
@@ -421,19 +416,38 @@ int main(){
 
   Render render;
   Input input;
+
+  // Сохраняем старое состояние терминала
+  TerminalState oldState = saveTerminal();
+
   // entering alt buffer
   std::cout << "\033[?1049h";
-  
+  // hide cursor
+  std::cout << "\033[?25l";
+  disableEcho();
+
   while (game_is_running == true){
     input.handle_input();
     update_game();
     render.draw();
       };
 
+
+  restoreTerminal(oldState);
   // exeting alt buffer
   std::cout << "\033[?1049l";
+  // show cursor again
+  //std::cout << "\033[?25h"; 
+  // enableEcho();
 
   return 0;
 
 };
 
+
+
+/*
+ что еще написать:
+управление сбоку
+счетчик очков
+ */

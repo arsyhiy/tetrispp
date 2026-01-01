@@ -18,6 +18,9 @@ static int field[FIELD_H][FIELD_W];  // note that 0 for empty 1 for full.
 // maybe i need a more pretty name for this
 static bool game_is_running = true;
 
+// score
+static int score = 0;
+
 // structs
 
 struct Tetromino {
@@ -136,16 +139,36 @@ class Game {
         }
     };
 
-    void update_game() {
-        move_down(t);  // i think move_down most be a update_game Function.
-        // we need colishion
+    void clear_line(int row) {
+        for (int i = row; i > 0; --i) {
+            for (int j = 0; j < FIELD_W; ++j) {
+                if (i < FIELD_H - 1) {
+                    field[i][j] = field[i - 1][j];
+                }
+            }
+        }
+
+        for (int j = 0; j < FIELD_W; ++j) {
+            field[0][j] = 0;
+        }
+    }
+    void clean_line() {
+        for (int i = FIELD_H - 1; i >= 1; --i) {
+            if (line_is_full(i)) {
+                clear_line(i);
+                i++;
+            }
+        }
+    }
+
+    bool line_is_full(int row) {
+        for (int b = 1; b < FIELD_W - 1; ++b) {
+            if (field[row][b] == 0) {
+                return false;
+            };
+        };
+        return true;
     };
-
-    void update() {
-
-    };
-
-    bool line_is_full(const Tetromino& t) { return true; };
 
     bool can_move_down(const Tetromino& t) {
         // Let's check if we can move the tetromino down
@@ -157,8 +180,8 @@ class Game {
                     int world_y = t.y + ty + 1;  // We check 1 cell below
 
                     // Проверяем, не выходит ли за пределы поля или не сталкивается с другим блоком
-                    if (world_y >= FIELD_H ||
-                        (world_x >= 0 && world_x < FIELD_W && field[world_y][world_x])) {
+                    if (world_y >= FIELD_H -1 ||
+                        (world_x >= 1 && world_x < FIELD_W -1 && field[world_y][world_x])) {
                         return false;  // Невозможно двигаться вниз, либо достигли дна, либо
                                        // столкнулись с блоком
                     }
@@ -177,7 +200,7 @@ class Game {
                     int world_x = t.x + tx - 1;
                     int world_y = t.y + ty;
 
-                    if (world_x < 0 ||
+                    if (world_x < 1 ||
                         (world_y >= 0 && world_y < FIELD_H && field[world_y][world_x])) {
                         return;  // Не можем двигаться влево
                     }
@@ -197,7 +220,7 @@ class Game {
                     int world_x = t.x + tx + 1;
                     int world_y = t.y + ty;
 
-                    if (world_x >= FIELD_W ||
+                    if (world_x >= FIELD_W -1 ||
                         (world_y >= 0 && world_y < FIELD_H && field[world_y][world_x])) {
                         return;  // We can't move to the right
                     }
@@ -228,6 +251,11 @@ class Game {
         }
 
         t.rotation = new_rotation;  // We are making a turn
+    };
+    void update() {
+        // we need colishion
+        move_down(t);  // i think move_down most be a update_game Function.
+        clean_line();
     };
 };
 
@@ -386,13 +414,37 @@ class Render {
         }
     };
 
+    void draw_frame_border() {
+        // Рисуем верхнюю и нижнюю границу
+        std::cout << "<!";
+        for (int fx = 1; fx < FIELD_W - 1; fx++) {
+            std::cout << "  ";  // Пустое пространство внутри
+        }
+        std::cout << "!>" << std::endl;
+
+        // Рисуем левую и правую границу
+        for (int fy = 1; fy < FIELD_H - 1; fy++) {
+            std::cout << "  ";  // Пустое пространство слева
+            for (int fx = 1; fx < FIELD_W - 1; fx++) {
+                std::cout << "..";  // Пустое пространство внутри
+            }
+            std::cout << "  " << std::endl;
+        }
+
+        std::cout << "<!";
+        for (int fx = 1; fx < FIELD_W - 1; fx++) {
+            std::cout << "==";  // Рисуем землю
+        }
+        std::cout << "!>" << std::endl;
+    }
+
     void clear_screen() { std::cout << "\033[H\033[2J"; };
 
     void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
 
     void draw() {
         clear_screen();
-        sleep_ms(16);  // must be a int variable i need to investigate that. NOTE that is temporay
+        sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is temporay
                        // version because is can get faster or slower by different cpu.
         draw_frame();
     };
@@ -414,7 +466,7 @@ int main() {
 
     while (game_is_running == true) {
         input.handle_input();
-        game.update_game();
+        game.update();
         render.draw();
     };
 

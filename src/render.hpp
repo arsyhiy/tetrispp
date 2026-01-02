@@ -1,5 +1,7 @@
 #pragma once
 class render{
 
-    void draw_frame();
+    public:
+    
+        void draw_frame();
 };

@@ -10,132 +10,15 @@
 
 
 
-#include <vector>
+//#include <vector>
 
-// static variables
 
-// field
-static const int FIELD_H = 20;       // hight
-static const int FIELD_W = 10;       // width
-static int field[FIELD_H][FIELD_W];// = {0};  // note that 0 for empty 1 for full.
+#include "stucture.hpp"
 
-// maybe i need a more pretty name for this
-static bool game_is_running = true;
 
-// score
-static int score = 0;  // intial value
 
-// structs
-
-struct Tetromino {
-    int type;
-    int rotation;
-    int x;
-    int y;
-};
 Tetromino t = {0, 0, FIELD_W / 2, 0};  // make it random
-
-
-
-
-
-
-const int shapes[7][4][4][4] = {
-    // I-тип
-    {// Поворот 0
-     {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}},
-     // Поворот 1
-     {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}},
-     // Поворот 2
-     {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}},
-     // Поворот 3
-     {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}}},
-    // J-тип
-    {
-        {{0, 0, 0, 0}, {1, 1, 1, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}},  // Поворот 0
-        {{1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 0, 0, 0}, {0, 0, 1, 1}, {1, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
-    },
-    // L-тип
-    {
-        {{0, 0, 0, 0}, {0, 1, 1, 1}, {0, 0, 0, 1}, {0, 0, 0, 0}},  // Поворот 0
-        {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 1}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 0, 0, 0}, {1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 1}, {0, 0, 0, 0}}   // Поворот 3
-    },
-    // O-тип
-    {
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 0
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}   // Поворот 3
-    },
-    // S-тип
-    {
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}},  // Поворот 0
-        {{1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 0, 0, 0}, {0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
-    },
-    // T-тип
-    {
-        {{0, 0, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}},  // Поворот 0
-        {{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
-    },
-    // Z-тип
-    {
-        {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 0
-        {{0, 1, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}},  // Поворот 1
-        {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 2
-        {{0, 1, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
-    }};
-
-
-struct ScreenBuffer {
-    int w, h;
-    std::vector<char> data;
-
-    ScreenBuffer(int w, int h)
-        : w(w), h(h), data(w * h, ' ') {}
-
-    void clear(char c = ' ') {
-        std::fill(data.begin(), data.end(), c);
-    }
-
-    void set(int x, int y, char c) {
-        if (x < 0 || y < 0 || x >= w || y >= h) return;
-        data[y * w + x] = c;
-    }
-
-    char get(int x, int y) const {
-        return data[y * w + x];
-    }
-};
-
-
-struct DoubleBuffer {
-    ScreenBuffer front;
-    ScreenBuffer back;
-
-    DoubleBuffer(int w, int h)
-        : front(w, h), back(w, h) {}
-
-    ScreenBuffer& draw() {   // куда рисуем
-        return back;
-    }
-
-    const ScreenBuffer& display() const { // что показываем
-        return front;
-    }
-
-    void swap() {
-        std::swap(front.data, back.data);
-    }
-};
-
+// static variables
 
 class Game {
    public:
@@ -512,7 +395,7 @@ void draw(DoubleBuffer& doubleBuffer) {
     sleep_ms(50);  // Временная задержка
 
     // Рисуем на back-буфере
-    draw_field(doubleBuffer.back, 2, 2);
+    draw_field(doubleBuffer.back, 0, 0);// rewrite it
 
     // Переключаем back и front буферы
     doubleBuffer.swap();

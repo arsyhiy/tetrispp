@@ -19,7 +19,7 @@ static int field[FIELD_H][FIELD_W];  // note that 0 for empty 1 for full.
 static bool game_is_running = true;
 
 // score
-static int score = 0;
+static int score = 0; //intial value
 
 // structs
 
@@ -156,6 +156,7 @@ class Game {
         for (int i = FIELD_H - 1; i >= 1; --i) {
             if (line_is_full(i)) {
                 clear_line(i);
+                score = score + 100;// rewrite to tetromino score point
                 i++;
             }
         }
@@ -180,8 +181,9 @@ class Game {
                     int world_y = t.y + ty + 1;  // We check 1 cell below
 
                     // Проверяем, не выходит ли за пределы поля или не сталкивается с другим блоком
-                    if (world_y >= FIELD_H -1 ||
-                        (world_x >= 1 && world_x < FIELD_W -1 && field[world_y][world_x])) {
+                    if (world_y >= FIELD_H - 1 ||
+                        (world_x >= 1 && world_x < FIELD_W - 1 && field[world_y][world_x])) {
+
                         return false;  // Невозможно двигаться вниз, либо достигли дна, либо
                                        // столкнулись с блоком
                     }
@@ -220,7 +222,7 @@ class Game {
                     int world_x = t.x + tx + 1;
                     int world_y = t.y + ty;
 
-                    if (world_x >= FIELD_W -1 ||
+                    if (world_x >= FIELD_W - 1 ||
                         (world_y >= 0 && world_y < FIELD_H && field[world_y][world_x])) {
                         return;  // We can't move to the right
                     }
@@ -306,65 +308,6 @@ class Input {
 
 class Render {
    public:
-    // struct Tetromino {
-    //    int shapes[4][4][4][4]; // [type][rotate][y][x].
-    //  };
-    // Tetromino t;;
-    //   struct ActiveTetromino {
-    //   int type;
-    //   int rotation;
-    //   int x;
-    //   int y;
-    // };
-    // ActiveTetromino t;
-
-    /*int drawfiled(){*/
-    /**/
-    /*  for(int a = 0; a < 20 ; a++)*/
-    /*    {*/
-    /*      for(int b = 0; b < 10; b++)*/
-    /*        {*/
-    /*          std::cout << Field[b][a] << " " ;*/
-    /*        }*/
-    /*        std::cout << "\n";*/
-    /*    }  */
-    /*    return 0;*/
-    /*};*/
-    /**/
-    /*void drawtetromino(){ // i dont sure  we need it const*/
-    /**/
-    /*  Tetromino t = {*/
-    /*    {*/
-    /*      {   // type 0*/
-    /*        {   // rotate 0*/
-    /*          {0,0,0,0},*/
-    /*          {1,1,1,1},*/
-    /*          {0,0,0,0},*/
-    /*          {0,0,0,0}*/
-    /*        },*/
-    /*        {   // rotate 1*/
-    /*          {0,0,1,0},*/
-    /*          {0,0,1,0},*/
-    /*          {0,0,1,0},*/
-    /*          {0,0,1,0}*/
-    /*        },*/
-    /*        {0}, // rotate 2*/
-    /*        {0}  // rotate 3*/
-    /*      },*/
-    /*      {0}, {0}, {0} // остальные типы*/
-    /*    }*/
-    /*  };*/
-    /*  int type = 0;*/
-    /*  int rot  = 0;*/
-    /**/
-    /*  for (int y = 0; y < 4; y++) {*/
-    /*      for (int x = 0; x < 4; x++) {*/
-    /*          std::cout << (t.shapes[type][rot][y][x] ? "[]" : ".");*/
-    /*      }*/
-    /*      std::cout << '\n';*/
-    /*  };*/
-    /*};*/
-
     // draw field and tetromino
     void draw_frame() {
         for (int fy = 0; fy < FIELD_H; fy++) {
@@ -437,6 +380,11 @@ class Render {
         }
         std::cout << "!>" << std::endl;
     }
+    void draw_score(){
+
+        std::cout <<"score: " << score;
+        std::cout <<"\n";
+    };
 
     void clear_screen() { std::cout << "\033[H\033[2J"; };
 
@@ -446,6 +394,7 @@ class Render {
         clear_screen();
         sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is temporay
                        // version because is can get faster or slower by different cpu.
+        draw_score();
         draw_frame();
     };
 };

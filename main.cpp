@@ -8,18 +8,22 @@
 #include <iostream>
 #include <thread>
 
+
+
+#include <vector>
+
 // static variables
 
 // field
 static const int FIELD_H = 20;       // hight
 static const int FIELD_W = 10;       // width
-static int field[FIELD_H][FIELD_W];  // note that 0 for empty 1 for full.
+static int field[FIELD_H][FIELD_W];// = {0};  // note that 0 for empty 1 for full.
 
 // maybe i need a more pretty name for this
 static bool game_is_running = true;
 
 // score
-static int score = 0; //intial value
+static int score = 0;  // intial value
 
 // structs
 
@@ -30,6 +34,11 @@ struct Tetromino {
     int y;
 };
 Tetromino t = {0, 0, FIELD_W / 2, 0};  // make it random
+
+
+
+
+
 
 const int shapes[7][4][4][4] = {
     // I-тип
@@ -84,36 +93,49 @@ const int shapes[7][4][4][4] = {
         {{0, 1, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
     }};
 
-// Функция для отключения отображения символов при вводе
-void disableEcho() {
-    struct termios settings;
-    tcgetattr(STDIN_FILENO, &settings);
-    settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
-    tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-}
 
-// Функция для включения отображения символов
-void enableEcho() {
-    struct termios settings;
-    tcgetattr(STDIN_FILENO, &settings);
-    settings.c_lflag |= ECHO;  // Включаем отображение символов
-    tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-}
+struct ScreenBuffer {
+    int w, h;
+    std::vector<char> data;
 
-struct TerminalState {
-    termios settings;
+    ScreenBuffer(int w, int h)
+        : w(w), h(h), data(w * h, ' ') {}
+
+    void clear(char c = ' ') {
+        std::fill(data.begin(), data.end(), c);
+    }
+
+    void set(int x, int y, char c) {
+        if (x < 0 || y < 0 || x >= w || y >= h) return;
+        data[y * w + x] = c;
+    }
+
+    char get(int x, int y) const {
+        return data[y * w + x];
+    }
 };
 
-// Сохраняем состояние терминала
-TerminalState saveTerminal() {
-    TerminalState state;
-    tcgetattr(STDIN_FILENO, &state.settings);
-    return state;
-}
-// Восстанавливаем состояние терминала
-void restoreTerminal(const TerminalState& state) {
-    tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
-}
+
+struct DoubleBuffer {
+    ScreenBuffer front;
+    ScreenBuffer back;
+
+    DoubleBuffer(int w, int h)
+        : front(w, h), back(w, h) {}
+
+    ScreenBuffer& draw() {   // куда рисуем
+        return back;
+    }
+
+    const ScreenBuffer& display() const { // что показываем
+        return front;
+    }
+
+    void swap() {
+        std::swap(front.data, back.data);
+    }
+};
+
 
 class Game {
    public:
@@ -123,19 +145,24 @@ class Game {
             t.y++;  // If we can, we move the tetromino down one square.
         } else {
             // If we can't, we fix the tetromino in the field
+            // maybe is a good idea move to another Function called lock_in or something like that
             for (int ty = 0; ty < 4; ++ty) {
                 for (int tx = 0; tx < 4; ++tx) {
                     if (shapes[t.type][t.rotation][ty][tx]) {
                         int world_x = t.x + tx;
                         int world_y = t.y + ty;
-                        if (world_y < FIELD_H) {
+                        if (world_y <
+                            FIELD_H - 1) {  // in fact FIELD_H is 1 hight smaller that it execpted
+                                            // but there is differents if we will write FIELD_H - 1
+                                            // or without - 1. but i will write with -1 tho avoid
+                                            // unexpected consequences
                             field[world_y][world_x] = 1;  // We fix the block on the field
                         }
                     }
                 }
             }
             // Tetromino is no longer moving, you can launch the next one
-            t.y = -1;  // We set a special value to signal that the tetromino is locked
+            t.y = -1;  // We set a special value to signal that the tetromino is locked. NOTE: check that thing because i don't see  a special value where it's commin because i dumb
         }
     };
 
@@ -156,7 +183,7 @@ class Game {
         for (int i = FIELD_H - 1; i >= 1; --i) {
             if (line_is_full(i)) {
                 clear_line(i);
-                score = score + 100;// rewrite to tetromino score point
+                score = score + 100;  // rewrite to tetromino score point
                 i++;
             }
         }
@@ -183,7 +210,6 @@ class Game {
                     // Проверяем, не выходит ли за пределы поля или не сталкивается с другим блоком
                     if (world_y >= FIELD_H - 1 ||
                         (world_x >= 1 && world_x < FIELD_W - 1 && field[world_y][world_x])) {
-
                         return false;  // Невозможно двигаться вниз, либо достигли дна, либо
                                        // столкнулись с блоком
                     }
@@ -254,6 +280,7 @@ class Game {
 
         t.rotation = new_rotation;  // We are making a turn
     };
+
     void update() {
         // we need colishion
         move_down(t);  // i think move_down most be a update_game Function.
@@ -356,48 +383,182 @@ class Render {
             std::cout << '\n';
         }
     };
+    //
+    // void draw_frame_border() {
+    //     // Рисуем верхнюю и нижнюю границу
+    //     std::cout << "<!";
+    //     for (int fx = 1; fx < FIELD_W - 1; fx++) {
+    //         std::cout << "  ";  // Пустое пространство внутри
+    //     }
+    //     std::cout << "!>" << std::endl;
+    //
+    //     // Рисуем левую и правую границу
+    //     for (int fy = 1; fy < FIELD_H - 1; fy++) {
+    //         std::cout << "  ";  // Пустое пространство слева
+    //         for (int fx = 1; fx < FIELD_W - 1; fx++) {
+    //             std::cout << "..";  // Пустое пространство внутри
+    //         }
+    //         std::cout << "  " << std::endl;
+    //     }
+    //
+    //     std::cout << "<!";
+    //     for (int fx = 1; fx < FIELD_W - 1; fx++) {
+    //         std::cout << "==";  // Рисуем землю
+    //     }
+    //     std::cout << "!>" << std::endl;
+    // }
+    
 
-    void draw_frame_border() {
-        // Рисуем верхнюю и нижнюю границу
-        std::cout << "<!";
-        for (int fx = 1; fx < FIELD_W - 1; fx++) {
-            std::cout << "  ";  // Пустое пространство внутри
-        }
-        std::cout << "!>" << std::endl;
+void draw_field(ScreenBuffer& buf, int ox, int oy) {
+    // рисуем поле + рамку
+    for (int y = 0; y < FIELD_H; ++y) {
+        for (int x = 0; x < FIELD_W; ++x) {
+            int sx = ox + x * 2; // если хочешь две клетки на символ
+            int sy = oy + y;
 
-        // Рисуем левую и правую границу
-        for (int fy = 1; fy < FIELD_H - 1; fy++) {
-            std::cout << "  ";  // Пустое пространство слева
-            for (int fx = 1; fx < FIELD_W - 1; fx++) {
-                std::cout << "..";  // Пустое пространство внутри
+            // Рисуем вертикальные стенки
+            if (x == 0 || x == FIELD_W - 1) {
+                buf.set(sx, sy, '|');
             }
-            std::cout << "  " << std::endl;
+            // Рисуем нижнюю границу
+            else if (y == FIELD_H - 1) { // Используем FIELD_H - 1 для нижней границы
+                buf.set(sx, sy, '=');
+            }
+            // Заполненные клетки поля
+            else if (field[y][x]) {
+                buf.set(sx, sy, '#');
+            }
+            // Пустые клетки поля
+            else {
+                buf.set(sx, sy, '.');
+            }
         }
-
-        std::cout << "<!";
-        for (int fx = 1; fx < FIELD_W - 1; fx++) {
-            std::cout << "==";  // Рисуем землю
-        }
-        std::cout << "!>" << std::endl;
     }
-    void draw_score(){
 
-        std::cout <<"score: " << score;
-        std::cout <<"\n";
+    // Рисуем тетромино
+    for (int ty = 0; ty < 4; ++ty) {
+        for (int tx = 0; tx < 4; ++tx) {
+            if (shapes[t.type][t.rotation][ty][tx]) {
+                int world_x = t.x + tx;
+                int world_y = t.y + ty;
+
+                // Проверка, чтобы тетромино не выходило за пределы поля
+                if (world_x >= 0 && world_x < FIELD_W && world_y >= 0 && world_y < FIELD_H) {
+                    buf.set(ox + world_x * 2, oy + world_y, '#');
+                }
+            }
+        }
+    }
+}
+
+
+    void draw_score() {
+        std::cout << "score: " << score;
+        std::cout << "\n";
     };
+
+    // Функция для отключения отображения символов при вводе
+    void disableEcho() {
+        struct termios settings;
+        tcgetattr(STDIN_FILENO, &settings);
+        settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+    }
+
+    // Функция для включения отображения символов
+    void enableEcho() {
+        struct termios settings;
+        tcgetattr(STDIN_FILENO, &settings);
+        settings.c_lflag |= ECHO;  // Включаем отображение символов
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+    }
+
+    struct TerminalState {
+        termios settings;
+    };
+
+    // Сохраняем состояние терминала
+    TerminalState saveTerminal() {
+        TerminalState state;
+        tcgetattr(STDIN_FILENO, &state.settings);
+        return state;
+    }
+    // Восстанавливаем состояние терминала
+    void restoreTerminal(const TerminalState& state) {
+        tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
+    }
 
     void clear_screen() { std::cout << "\033[H\033[2J"; };
 
     void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
 
-    void draw() {
-        clear_screen();
-        sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is temporay
-                       // version because is can get faster or slower by different cpu.
-        draw_score();
-        draw_frame();
-    };
+    // void draw() {
+    //     clear_screen();
+    //     sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is temporay
+    //                    // version because is can get faster or slower by different cpu.
+    //
+    //
+    //                    // Конструктор DoubleBuffer, передаем параметры ширины и высоты
+    //     DoubleBuffer doubleBuffer(FIELD_W * 2, FIELD_H);  // Умножаем FIELD_W на 2 для удлинения клетки
+    //     draw_field(doubleBuffer.back, 2, 2);
+    //
+    //     doubleBuffer.swap();
+    //   //  draw_score();
+    //   //  draw_frame();
+    // };
+    
+void draw(DoubleBuffer& doubleBuffer) {
+    clear_screen();
+    sleep_ms(50);  // Временная задержка
+
+    // Рисуем на back-буфере
+    draw_field(doubleBuffer.back, 2, 2);
+
+    // Переключаем back и front буферы
+    doubleBuffer.swap();
+
+    // Отображаем front буфер на экране (это то, что видит пользователь)
+    const ScreenBuffer& front = doubleBuffer.display();
+    for (int y = 0; y < FIELD_H; ++y) {
+        for (int x = 0; x < FIELD_W * 2; ++x) {  // умножаем на 2 для удлиненной клетки
+            std::cout << front.get(x, y);
+        }
+        std::cout << "\n";
+    }
+}
 };
+
+// int main() {
+//     Render render;
+//     Input input;
+//     Game game;
+//
+//     // Сохраняем старое состояние терминала
+//     Render::TerminalState oldState = render.saveTerminal();
+//
+//     // entering alt buffer
+//     std::cout << "\033[?1049h";
+//     // hide cursor
+//     std::cout << "\033[?25l";
+//     render.disableEcho();
+//
+//     while (game_is_running == true) {
+//         input.handle_input();
+//         game.update();
+//         render.draw();
+//     };
+//
+//     render.restoreTerminal(oldState);
+//     // exeting alt buffer
+//     std::cout << "\033[?1049l";
+//     // show cursor again
+//     std::cout << "\033[?25h";
+//     // enableEcho();
+//
+//     return 0;
+// };
+//
+
 
 int main() {
     Render render;
@@ -405,22 +566,27 @@ int main() {
     Game game;
 
     // Сохраняем старое состояние терминала
-    TerminalState oldState = saveTerminal();
+    Render::TerminalState oldState = render.saveTerminal();
 
     // entering alt buffer
     std::cout << "\033[?1049h";
     // hide cursor
     std::cout << "\033[?25l";
-    disableEcho();
+    render.disableEcho();
 
-    while (game_is_running == true) {
+    // Создаем объект DoubleBuffer один раз
+    DoubleBuffer doubleBuffer(FIELD_W * 2, FIELD_H);  // Умножаем FIELD_W на 2 для удлинения клетки
+
+    while (game_is_running) {
         input.handle_input();
         game.update();
-        render.draw();
+
+        // Используем doubleBuffer для рисования
+        render.draw(doubleBuffer);  // передаем doubleBuffer в draw
     };
 
-    restoreTerminal(oldState);
-    // exeting alt buffer
+    render.restoreTerminal(oldState);
+    // exiting alt buffer
     std::cout << "\033[?1049l";
     // show cursor again
     std::cout << "\033[?25h";

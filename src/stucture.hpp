@@ -1,32 +1,36 @@
 #pragma once
-#include <fcntl.h>
+
+// #include <fcntl.h>
+// #include <termios.h>
+// #include <unistd.h>
+//
+// //#include <chrono>
+// #include <cstdio>
+// #include <cstdlib>
+// //#include <thread>
+//
+//
+//
+
+
 #include <termios.h>
-#include <unistd.h>
-
-//#include <chrono>
-#include <cstdio>
-#include <cstdlib>
-//#include <iostream>
-//#include <thread>
-
-
-
+#include <iostream>
 #include <vector>
-
-
-
 
 
 // field
 static const int FIELD_H = 20;       // hight
 static const int FIELD_W = 10;       // width
-static int field[FIELD_H][FIELD_W];// = {0};  // note that 0 for empty 1 for full.
+static int field[FIELD_H][FIELD_W] = {0};  // note that 0 for empty 1 for full.
+
 
 // maybe i need a more pretty name for this
 static bool game_is_running = true;
 
 // score
 static int score = 0;  // intial value
+
+
 
 // structs
 
@@ -36,7 +40,7 @@ struct Tetromino {
     int x;
     int y;
 };
-extern Tetromino t;
+//extern //Tetromino t;
 
 
 
@@ -93,7 +97,8 @@ const int shapes[7][4][4][4] = {
         {{0, 1, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}},  // Поворот 1
         {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}},  // Поворот 2
         {{0, 1, 0, 0}, {1, 1, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}}   // Поворот 3
-    }};
+    }
+};
 
 
 struct ScreenBuffer {
@@ -139,4 +144,7 @@ struct DoubleBuffer {
 };
 
 
+struct TerminalState {
+         termios settings;
+     };
 

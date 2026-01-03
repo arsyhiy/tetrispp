@@ -10,7 +10,6 @@
 // //#include <thread>
 //
 //
-//
 
 
 #include <termios.h>
@@ -101,6 +100,28 @@ const int shapes[7][4][4][4] = {
 };
 
 
+
+struct TerminalState {
+         termios settings;
+     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct ScreenBuffer {
     int w, h;
     std::vector<char> data;
@@ -142,9 +163,4 @@ struct DoubleBuffer {
         std::swap(front.data, back.data);
     }
 };
-
-
-struct TerminalState {
-         termios settings;
-     };
 

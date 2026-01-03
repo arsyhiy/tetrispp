@@ -31,7 +31,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(my_game
     src/main.cpp
-    #src/render.cpp
+    src/Render.cpp
+    src/Input.cpp
+    src/Game.cpp
 )
 
 # Поиск всех .cpp и .h файлов в директории src и подкаталогах

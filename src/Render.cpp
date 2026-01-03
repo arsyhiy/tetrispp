@@ -68,54 +68,6 @@ void Render::draw_frame() {
 
 void Render::draw_field(ScreenBuffer& buf, int ox, int oy) {
 
-};
-
-void Render::draw_score() {
-
-};
-
-void Render::disableEcho() {
-
-};
-
-void Render::enableEcho() {
-
-};
-
-void restoreTerminal(const TerminalState& state);
-
-void Render::draw(DoubleBuffer& doubleBuffer) {
-
-};
-
-// draw field and tetromino
-void draw_frame() {};
-//
-// void draw_frame_border() {
-//     // Рисуем верхнюю и нижнюю границу
-//     std::cout << "<!";
-//     for (int fx = 1; fx < FIELD_W - 1; fx++) {
-//         std::cout << "  ";  // Пустое пространство внутри
-//     }
-//     std::cout << "!>" << std::endl;
-//
-//     // Рисуем левую и правую границу
-//     for (int fy = 1; fy < FIELD_H - 1; fy++) {
-//         std::cout << "  ";  // Пустое пространство слева
-//         for (int fx = 1; fx < FIELD_W - 1; fx++) {
-//             std::cout << "..";  // Пустое пространство внутри
-//         }
-//         std::cout << "  " << std::endl;
-//     }
-//
-//     std::cout << "<!";
-//     for (int fx = 1; fx < FIELD_W - 1; fx++) {
-//         std::cout << "==";  // Рисуем землю
-//     }
-//     std::cout << "!>" << std::endl;
-// }
-
-void draw_field(ScreenBuffer& buf, int ox, int oy) {
     // рисуем поле + рамку
     for (int y = 0; y < FIELD_H; ++y) {
         for (int x = 0; x < FIELD_W; ++x) {
@@ -155,38 +107,65 @@ void draw_field(ScreenBuffer& buf, int ox, int oy) {
             }
         }
     }
-}
+};
 
-void draw_score() {
+void Render::draw_score() {
+
     std::cout << "score: " << score;
     std::cout << "\n";
 };
 
 // Функция для отключения отображения символов при вводе
-void disableEcho() {
+void Render::disableEcho() {
+
     struct termios settings;
     tcgetattr(STDIN_FILENO, &settings);
     settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
     tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-}
+};
 
 // Функция для включения отображения символов
-void enableEcho() {
+void Render::enableEcho() {
+
     struct termios settings;
     tcgetattr(STDIN_FILENO, &settings);
     settings.c_lflag |= ECHO;  // Включаем отображение символов
     tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-}
+};
+
+// Восстанавливаем состояние терминала
+void restoreTerminal(const TerminalState& state){
+    tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
+};
+
+void Render::draw(DoubleBuffer& doubleBuffer) {
+
+    clear_screen();
+    sleep_ms(50);  // Временная задержка
+
+    // Рисуем на back-буфере
+    draw_field(doubleBuffer.back, 0, 0);  // rewrite it
+
+    // Переключаем back и front буферы
+    doubleBuffer.swap();
+
+    // Отображаем front буфер на экране (это то, что видит пользователь)
+    const ScreenBuffer& front = doubleBuffer.display();
+    for (int y = 0; y < FIELD_H; ++y) {
+        for (int x = 0; x < FIELD_W * 2; ++x) {  // умножаем на 2 для удлиненной клетки
+            std::cout << front.get(x, y);
+        }
+        std::cout << "\n";
+    }
+};
+
+
 
 // Сохраняем состояние терминала
 TerminalState saveTerminal() {
     TerminalState state;
     tcgetattr(STDIN_FILENO, &state.settings);
     return state;
-}
-// Восстанавливаем состояние терминала
-void restoreTerminal(const TerminalState& state) {
-    tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
 }
 
 void clear_screen() { std::cout << "\033[H\033[2J"; };
@@ -209,22 +188,3 @@ void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms
 //   //  draw_frame();
 // };
 
-void draw(DoubleBuffer& doubleBuffer) {
-    clear_screen();
-    sleep_ms(50);  // Временная задержка
-
-    // Рисуем на back-буфере
-    draw_field(doubleBuffer.back, 0, 0);  // rewrite it
-
-    // Переключаем back и front буферы
-    doubleBuffer.swap();
-
-    // Отображаем front буфер на экране (это то, что видит пользователь)
-    const ScreenBuffer& front = doubleBuffer.display();
-    for (int y = 0; y < FIELD_H; ++y) {
-        for (int x = 0; x < FIELD_W * 2; ++x) {  // умножаем на 2 для удлиненной клетки
-            std::cout << front.get(x, y);
-        }
-        std::cout << "\n";
-    }
-}

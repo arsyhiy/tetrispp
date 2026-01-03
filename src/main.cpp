@@ -41,7 +41,7 @@ int main() {
     Game game;
 
     // Сохраняем старое состояние терминала
-    TerminalState oldState = render.saveTerminal();
+//    TerminalState oldState = render.saveTerminal();
 
     // entering alt buffer
     std::cout << "\033[?1049h";
@@ -63,7 +63,7 @@ int main() {
         render.draw(doubleBuffer);  // передаем doubleBuffer в draw.
     };
 
-    render.restoreTerminal(oldState);
+  //  render.restoreTerminal(oldState);
     // exiting alt buffer
     std::cout << "\033[?1049l";
     // show cursor again

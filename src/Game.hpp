@@ -1,6 +1,6 @@
+#pragma once
 #include "stucture.hpp"
 
-extern Tetromino t;
 
 class Game{
 
@@ -13,4 +13,5 @@ class Game{
         void clean_line();
         bool line_is_full(int row);
         void clear_line(int row);
+        bool can_move_down(const Tetromino& t);
 };

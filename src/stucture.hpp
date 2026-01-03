@@ -39,7 +39,7 @@ struct Tetromino {
     int x;
     int y;
 };
-//extern //Tetromino t;
+extern Tetromino t;
 
 
 

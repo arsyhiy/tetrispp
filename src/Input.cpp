@@ -42,7 +42,7 @@ void Input::handle_input(Game& game) {
         char input = getchar();
 
         // 27 means esc button
-        if (input == 27) {
+        if (input == 27 || input == KEY_EXIT) {
             game.is_running = false;  // for now i will use variable from game_state.hpp
         } else if (input == 'a' || input == 'A') {  // left
             game.move_left(game.t);

@@ -1,5 +1,7 @@
 #pragma once
-// #include "stucture.hpp"
+#include "iostream"
+#include <chrono>
+#include <thread>
 
 class Game {
    public:
@@ -18,8 +20,8 @@ class Game {
         int x;
         int y;
     };
-  Tetromino t; 
-  // Tetromino t = {0, 0, FIELD_W / 2, 0}; something like that for start
+  //Tetromino t; 
+  Tetromino t = {0, 0, FIELD_W / 2, 0};// something like that for start
 
     const int shapes[7][4][4][4] = {
         // I-тип
@@ -80,13 +82,14 @@ class Game {
     // score
     int score = 0;  // intial value
 
-    // void move_down(Tetromino& t);
-    //  void move_left(Tetromino& t);
-    //  void move_right(Tetromino& t);
-    //  void rotate(Tetromino& t);
+    bool can_move_down(const Tetromino& t);
+    void move_down(Tetromino& t);
+
+    void move_left(Tetromino& t);
+    void move_right(Tetromino& t);
+    void rotate(Tetromino& t);
     void update();
-    // void clean_line();
-    // bool line_is_full(int row);
-    // void clear_line(int row);
-    // bool can_move_down(const Tetromino& t);
+    void clean_line();
+    bool line_is_full(int row);
+    void clear_line(int row);
 };

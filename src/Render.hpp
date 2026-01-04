@@ -3,16 +3,15 @@
 
 class Render {
    public:
-    // void draw_frame();
+  void draw_frame(const Game& game);
     // void draw_field(ScreenBuffer& buf, int ox, int oy);
+
     // void draw_score();
-    // void disableEcho();
-    // void enableEcho();
 
-    // TerminalState saveTerminal();
-    // void restoreTerminal(const TerminalState& state);
 
+    // interesting how refresh is working in ncures
     // void clear_screen() { std::cout << "\033[H\033[2J"; };
-    // void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
-    void draw();
+    void sleep_ms(int ms) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
+    void draw(const Game& game);
 };

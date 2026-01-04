@@ -96,9 +96,9 @@ int main() {
     noecho();
     curs_set(0);
     while (game.is_running) {
-        input.handle_input();
+      input.handle_input(game);
         game.update();
-        render.draw();
+        render.draw(game);
     };
     endwin();
     // ncurses приложение в миниатюре

@@ -4,7 +4,6 @@
 // #include <termios.h>
 // #include <unistd.h>
 
-// #include <chrono>
 // #include <cstdio>
 // #include <cstdlib>
 // #include <iostream>
@@ -14,55 +13,65 @@
 // #include "Input.hpp"
 // #include "stucture.hpp"
 
-// extern Tetromino t;
 
-// void Render::draw_frame() {
-//     for (int fy = 0; fy < FIELD_H; fy++) {
-//         for (int fx = 0; fx < FIELD_W; fx++) {
-//             // draw left wall
-//             if (fx == 0) {
-//                 std::cout << "<!";
-//                 continue;
-//             }
-//             // draw right wall
-//             if (fx == FIELD_W - 1) {
-//                 std::cout << "!>";
-//                 continue;
-//             }
-//             // draw the ground
-//             if (fy == FIELD_H - 1) {
-//                 std::cout << "==";
-//                 continue;
-//             }
+void Render::draw_frame(const Game& game) {
+    // for (int fy = 0; fy < FIELD_H; fy++) {
+    //     for (int fx = 0; fx < FIELD_W; fx++) {
+    //         // draw left wall
+    //         if (fx == 0) {
+    //             std::cout << "<!";
+    //             continue;
+    //         }
+    //         // draw right wall
+    //         if (fx == FIELD_W - 1) {
+    //             std::cout << "!>";
+    //             continue;
+    //         }
+    //         // draw the ground
+    //         if (fy == FIELD_H - 1) {
+    //             std::cout << "==";
+    //             continue;
+    //         }
 
-//             // check if there is the block
-//             if (field[fy][fx]) {
-//                 std::cout << "[]";
-//                 continue;
-//             }
+    //         // check if there is the block
+    //         if (field[fy][fx]) {
+    //             std::cout << "[]";
+    //             continue;
+    //         }
 
-//             // check if there is tetromino in current location
-//             bool drawn = false;
-//             for (int ty = 0; ty < 4 && !drawn; ty++) {
-//                 for (int tx = 0; tx < 4 && !drawn; tx++) {
-//                     if (shapes[t.type][t.rotation][ty][tx]) {
-//                         int world_x = t.x + tx;
-//                         int world_y = t.y + ty;
-//                         if (world_x == fx && world_y == fy) {
-//                             std::cout << "[]";
-//                             drawn = true;
-//                         }
-//                     }
-//                 }
-//             }
+    //         // check if there is tetromino in current location
+    //         bool drawn = false;
+    //         for (int ty = 0; ty < 4 && !drawn; ty++) {
+    //             for (int tx = 0; tx < 4 && !drawn; tx++) {
+    //                 if (shapes[t.type][t.rotation][ty][tx]) {
+    //                     int world_x = t.x + tx;
+    //                     int world_y = t.y + ty;
+    //                     if (world_x == fx && world_y == fy) {
+    //                         std::cout << "[]";
+    //                         drawn = true;
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-//             // if there is empty space draw ..
-//             if (!drawn)
-//                 std::cout << "..";
-//         }
-//         std::cout << '\n';
-//     }
-// };
+    //         // if there is empty space draw ..
+    //         if (!drawn)
+    //             std::cout << "..";
+    //     }
+    //     std::cout << '\n';
+    // }
+    // рисуем поле
+    for(int y=0; y<Game::FIELD_H; ++y)
+        for(int x=0; x<Game::FIELD_W; ++x)
+            mvaddch(y, x*2, game.field[y][x] ? '#' : '.');
+
+    // рисуем активное тетромино
+    for(int ty=0; ty<4; ++ty)
+        for(int tx=0; tx<4; ++tx)
+            if(game.shapes[game.t.type][game.t.rotation][ty][tx])
+                mvaddch(game.t.y + ty,
+                        (game.t.x + tx)*2, '#');
+};
 
 // void Render::draw_field(ScreenBuffer& buf, int ox, int oy) {
 //     /*
@@ -117,27 +126,6 @@
 //     std::cout << "\n";
 // };
 
-// // Функция для отключения отображения символов при вводе
-// void Render::disableEcho() {
-//     struct termios settings;
-//     tcgetattr(STDIN_FILENO, &settings);
-//     settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
-//     tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-// };
-
-// // Функция для включения отображения символов
-// void Render::enableEcho() {
-//     struct termios settings;
-//     tcgetattr(STDIN_FILENO, &settings);
-//     settings.c_lflag |= ECHO;  // Включаем отображение символов
-//     tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-// };
-
-// // Восстанавливаем состояние терминала
-// void restoreTerminal(const TerminalState& state) {
-//     tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
-// };
-
 // void Render::draw(DoubleBuffer& doubleBuffer) {
 //     clear_screen();
 //     sleep_ms(50);  // Временная задержка
@@ -158,17 +146,6 @@
 //     }
 // };
 
-// // Сохраняем состояние терминала
-// TerminalState saveTerminal() {
-//     TerminalState state;
-//     tcgetattr(STDIN_FILENO, &state.settings);
-//     return state;
-// }
-
-// void clear_screen() { std::cout << "\033[H\033[2J"; };
-
-// void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
-
 // //  void draw() {
 // //      clear_screen();
 // //      sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is
@@ -187,7 +164,9 @@
 
 #include "ncurses.h"
 
-void Render::draw() {
+void Render::draw(const Game& game) {
     refresh();
-    mvprintw(5, 10, "Hello tetris");
+    sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is
+    draw_frame(game);
+    //mvprintw(5, 10, "Hello tetris");
 };

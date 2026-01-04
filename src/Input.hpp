@@ -2,8 +2,9 @@
 
 #include "Game.hpp"
 #include "ncurses.h"
-
 class Input {
    public:
-    void handle_input();
+
+    bool kbhit();
+    void handle_input(Game& game);
 };

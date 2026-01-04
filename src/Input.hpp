@@ -1,8 +1,9 @@
-#include "stucture.hpp"
-
 #pragma once
+#include "stucture.hpp"
+extern Tetromino t;
+
 class Input{
     public:
-        bool kbhit();
-        void handle_input();
+        // bool kbhit();
+        // void handle_input();
 };

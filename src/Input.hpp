@@ -1,6 +1,5 @@
 #pragma once
-#include "stucture.hpp"
-extern Tetromino t;
+//#include "stucture.hpp"
 
 class Input{
     public:

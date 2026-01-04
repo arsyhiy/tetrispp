@@ -1,18 +1,18 @@
 #include "Render.hpp"
 
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
+// #include <fcntl.h>
+// #include <termios.h>
+// #include <unistd.h>
 
-#include <chrono>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <thread>
+// #include <chrono>
+// #include <cstdio>
+// #include <cstdlib>
+// #include <iostream>
+// #include <thread>
 
-#include "Game.hpp"
-#include "Input.hpp"
-#include "stucture.hpp"
+// #include "Game.hpp"
+// #include "Input.hpp"
+// #include "stucture.hpp"
 
 // extern Tetromino t;
 

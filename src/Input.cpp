@@ -1,18 +1,17 @@
 #include "Input.hpp"
 
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
+// #include <fcntl.h>
+// #include <termios.h>
+// #include <unistd.h>
 
-#include <chrono>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <thread>
+// #include <chrono>
+// #include <cstdio>
+// #include <cstdlib>
+// #include <iostream>
+// #include <thread>
 
-#include "Game.hpp"
-#include "game_state.hpp"
-#include "stucture.hpp"
+// #include "Game.hpp"
+// #include "stucture.hpp"
 
 // bool Input::kbhit() {
 //     struct termios settings;

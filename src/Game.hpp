@@ -1,11 +1,14 @@
 #pragma once
-#include "stucture.hpp"
+//#include "stucture.hpp"
 
 
 class Game{
 
-    public:
-        // void move_down(Tetromino& t);
+public:
+
+
+  bool is_running = true;
+  //void move_down(Tetromino& t);
         // void move_left(Tetromino& t);
         // void move_right(Tetromino& t);
         // void rotate(Tetromino& t);

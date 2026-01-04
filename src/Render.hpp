@@ -1,8 +1,8 @@
 #pragma once
-#include <thread>
-#include <chrono>
-#include "stucture.hpp"
-#include <iostream>
+// #include <thread>
+// #include <chrono>
+// #include "stucture.hpp"
+// #include <iostream>
 
 class Render{
 

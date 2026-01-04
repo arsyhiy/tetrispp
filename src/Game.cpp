@@ -4,8 +4,7 @@
 
 #include "Game.hpp"
 
-#include "game_state.hpp"
-#include "stucture.hpp"
+//#include "stucture.hpp"
 
 // Tetromino t = {0, 0, FIELD_W / 2, 0};  // make it random
 

@@ -61,6 +61,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Собираем все исходники
 add_executable(tetrispp
+    src/Game.cpp
+    src/Input.cpp
+    src/Render.cpp
     src/main.cpp
 )
 

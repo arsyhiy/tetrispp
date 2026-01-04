@@ -72,8 +72,6 @@
 //     // std::cout << "\033[?25h";
 //     // render.enableEcho();
 
-
-
 //     return 0;
 // };
 
@@ -83,28 +81,35 @@
 счетчик очков
  */
 
-
-
-
 #include "Game.hpp"
-#include "ncurses.h"
+#include "Input.hpp"
+#include "Render.hpp"
 #include "iostream"
+#include "ncurses.h"
 
+int main() {
+    Game game;
+    Input input;
+    Render render;
 
-int main(){
-
-  Game game;
-  
-  while(game.is_running){
-  };
     initscr();
     noecho();
     curs_set(0);
-    keypad(stdscr, TRUE);
-    mvprintw(5, 10, "Hello ncurses!");
-    refresh();
-    getch();
+    while (game.is_running) {
+        input.handle_input();
+        game.update();
+        render.draw();
+    };
     endwin();
-    
-  return 0;
+    // ncurses приложение в миниатюре
+    // initscr();
+    // noecho();
+    // curs_set(0);
+    // keypad(stdscr, TRUE);
+    // mvprintw(5, 10, "Hello ncurses!");
+    // refresh();
+    // getch();
+    // endwin();
+
+    return 0;
 };

@@ -1,8 +1,9 @@
 #pragma once
-//#include "stucture.hpp"
 
-class Input{
-    public:
-        // bool kbhit();
-        // void handle_input();
+#include "Game.hpp"
+#include "ncurses.h"
+
+class Input {
+   public:
+    void handle_input();
 };

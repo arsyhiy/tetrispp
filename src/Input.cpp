@@ -18,7 +18,8 @@
 //     int ch, stdinFlags;  // make sure input is a good naming
 
 //     tcgetattr(STDIN_FILENO, &settings);  // Getting the current terminal settings
-//     settings.c_lflag &= ~ICANON;         // Disable canonical mode (input is available immediately,
+//     settings.c_lflag &= ~ICANON;         // Disable canonical mode (input is available
+//     immediately,
 //                                          // without waiting for Enter)
 //     settings.c_cc[VMIN] = 1;   // Require at least 1 character to return from read// Require at
 //                                // least 1 character to return from read
@@ -55,3 +56,7 @@
 //         }
 //     }
 // };
+
+void Input::handle_input() {
+
+};

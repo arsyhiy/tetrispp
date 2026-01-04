@@ -4,7 +4,7 @@
 
 #include "Game.hpp"
 
-//#include "stucture.hpp"
+// #include "stucture.hpp"
 
 // Tetromino t = {0, 0, FIELD_W / 2, 0};  // make it random
 
@@ -44,7 +44,8 @@
 //                     if (world_y < FIELD_H - 1) {  // in fact FIELD_H is 1 hight smaller that it
 //                                                   // execpted but there is differents if we will
 //                                                   // write FIELD_H -1 or without - 1. but i will
-//                                                   // write with -1 tho avoid unexpected consequences
+//                                                   // write with -1 tho avoid unexpected
+//                                                   consequences
 //                         field[world_y][world_x] = 1;  // We fix the block on the field
 //                     }
 //                 }
@@ -52,7 +53,8 @@
 //         }
 //         // Tetromino is no longer moving, you can launch the next one
 //         t.y =
-//             -1;  // We set a special value to signal that the tetromino is locked. NOTE: check that
+//             -1;  // We set a special value to signal that the tetromino is locked. NOTE: check
+//             that
 //                  // thing because i don't see  a special value where it's commin because i dumb
 //     }
 // };
@@ -66,7 +68,8 @@
 //                 int world_x = t.x + tx - 1;
 //                 int world_y = t.y + ty;
 
-//                 if (world_x < 1 || (world_y >= 0 && world_y < FIELD_H && field[world_y][world_x])) {
+//                 if (world_x < 1 || (world_y >= 0 && world_y < FIELD_H &&
+//                 field[world_y][world_x])) {
 //                     return;  // Не можем двигаться влево
 //                 }
 //             }
@@ -157,6 +160,6 @@
 //     clean_line();
 // };
 
+void Game::update() {
 
-
-
+};

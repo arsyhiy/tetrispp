@@ -67,7 +67,8 @@
 // void Render::draw_field(ScreenBuffer& buf, int ox, int oy) {
 //     /*
 //       BUG: класс game все знает куда падает тетромино тоесть игра работает но вот screenbuffer
-//       ничего незнает от где  находится упавшие тетромино и за чего не рисует их но поле заполняется
+//       ничего незнает от где  находится упавшие тетромино и за чего не рисует их но поле
+//       заполняется
 //     */
 
 //     // рисуем поле + рамку
@@ -170,7 +171,8 @@
 
 // //  void draw() {
 // //      clear_screen();
-// //      sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is   temporay
+// //      sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is
+// temporay
 // //                     // version because is can get faster or slower by different cpu.
 
 // //                     // Конструктор DoubleBuffer, передаем параметры ширины и высоты
@@ -182,3 +184,10 @@
 // //    //  draw_frame();
 // // draw_frame()
 // // };
+
+#include "ncurses.h"
+
+void Render::draw() {
+    refresh();
+    mvprintw(5, 10, "Hello tetris");
+};

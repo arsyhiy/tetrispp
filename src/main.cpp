@@ -34,6 +34,7 @@
 #include "Game.hpp"
 #include "Input.hpp"
 #include "Render.hpp"
+#include "game_state.hpp"
 
 int main() {
     Render render;
@@ -41,7 +42,7 @@ int main() {
     Game game;
 
     // Сохраняем старое состояние терминала
-//    TerminalState oldState = render.saveTerminal();
+    //    TerminalState oldState = render.saveTerminal();
 
     // entering alt buffer
     std::cout << "\033[?1049h";
@@ -56,14 +57,14 @@ int main() {
 
     while (game_is_running) {
         input.handle_input();
-        game.update();
+        //game.update();
 
         // Используем doubleBuffer для рисования
         // я думаю что этот файл не должен знать про doubleBuffer
-        render.draw(doubleBuffer);  // передаем doubleBuffer в draw.
+        //render.draw(doubleBuffer);  // передаем doubleBuffer в draw.
     };
 
-  //  render.restoreTerminal(oldState);
+    //  render.restoreTerminal(oldState);
     // exiting alt buffer
     std::cout << "\033[?1049l";
     // show cursor again

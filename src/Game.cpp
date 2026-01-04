@@ -1,5 +1,12 @@
+/*
+  TODO: переработать так что бы работать с  doublebuffer.
+*/
+
+
 #include "Game.hpp"
+
 #include "stucture.hpp"
+#include "game_state.hpp"
 
 Tetromino t = {0, 0, FIELD_W / 2, 0};  // make it random
 

@@ -10,10 +10,8 @@
 #include <iostream>
 #include <thread>
 
-
 #include "Game.hpp"
 #include "Input.hpp"
-
 #include "stucture.hpp"
 
 extern Tetromino t;
@@ -67,6 +65,10 @@ void Render::draw_frame() {
 };
 
 void Render::draw_field(ScreenBuffer& buf, int ox, int oy) {
+    /*
+      BUG: класс game все знает куда падает тетромино тоесть игра работает но вот screenbuffer
+      ничего незнает от где  находится упавшие тетромино и за чего не рисует их но поле заполняется
+    */
 
     // рисуем поле + рамку
     for (int y = 0; y < FIELD_H; ++y) {
@@ -110,14 +112,12 @@ void Render::draw_field(ScreenBuffer& buf, int ox, int oy) {
 };
 
 void Render::draw_score() {
-
     std::cout << "score: " << score;
     std::cout << "\n";
 };
 
 // Функция для отключения отображения символов при вводе
 void Render::disableEcho() {
-
     struct termios settings;
     tcgetattr(STDIN_FILENO, &settings);
     settings.c_lflag &= ~ECHO;  // Отключаем отображение символов
@@ -126,7 +126,6 @@ void Render::disableEcho() {
 
 // Функция для включения отображения символов
 void Render::enableEcho() {
-
     struct termios settings;
     tcgetattr(STDIN_FILENO, &settings);
     settings.c_lflag |= ECHO;  // Включаем отображение символов
@@ -134,12 +133,11 @@ void Render::enableEcho() {
 };
 
 // Восстанавливаем состояние терминала
-void restoreTerminal(const TerminalState& state){
+void restoreTerminal(const TerminalState& state) {
     tcsetattr(STDIN_FILENO, TCSANOW, &state.settings);
 };
 
 void Render::draw(DoubleBuffer& doubleBuffer) {
-
     clear_screen();
     sleep_ms(50);  // Временная задержка
 
@@ -159,8 +157,6 @@ void Render::draw(DoubleBuffer& doubleBuffer) {
     }
 };
 
-
-
 // Сохраняем состояние терминала
 TerminalState saveTerminal() {
     TerminalState state;
@@ -172,19 +168,17 @@ void clear_screen() { std::cout << "\033[H\033[2J"; };
 
 void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
 
-// void draw() {
-//     clear_screen();
-//     sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is
-//     temporay
-//                    // version because is can get faster or slower by different cpu.
-//
-//
-//                    // Конструктор DoubleBuffer, передаем параметры ширины и высоты
-//     DoubleBuffer doubleBuffer(FIELD_W * 2, FIELD_H);  // Умножаем FIELD_W на 2 для удлинения
-//     клетки draw_field(doubleBuffer.back, 2, 2);
-//
-//     doubleBuffer.swap();
-//   //  draw_score();
-//   //  draw_frame();
-// };
+//  void draw() {
+//      clear_screen();
+//      sleep_ms(50);  // must be a int variable i need to investigate that. NOTE that is   temporay
+//                     // version because is can get faster or slower by different cpu.
 
+//                     // Конструктор DoubleBuffer, передаем параметры ширины и высоты
+//      DoubleBuffer doubleBuffer(FIELD_W * 2, FIELD_H);  // Умножаем FIELD_W на 2 для удлинения
+//      клетки draw_field(doubleBuffer.back, 2, 2);
+
+//      doubleBuffer.swap();
+//    //  draw_score();
+//    //  draw_frame();
+// draw_frame()
+// };

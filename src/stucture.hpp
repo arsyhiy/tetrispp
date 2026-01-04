@@ -23,8 +23,6 @@ static const int FIELD_W = 10;       // width
 static int field[FIELD_H][FIELD_W] = {0};  // note that 0 for empty 1 for full.
 
 
-// maybe i need a more pretty name for this
-static bool game_is_running = true;
 
 // score
 static int score = 0;  // intial value
@@ -113,6 +111,9 @@ struct TerminalState {
 
 
 
+/*
+переосмыслеть использованиие screenbuffer и doublebuffer
+ */
 
 
 

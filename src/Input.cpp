@@ -12,6 +12,7 @@
 
 #include "Game.hpp"
 #include "stucture.hpp"
+#include "game_state.hpp"
 
 extern Tetromino t;
 
@@ -44,7 +45,7 @@ void Input::handle_input() {
         char input = getchar();
 
         if (input == 27) {  // ESC for exit
-            game_is_running = false;
+          game_is_running = false; // по какойто причине это не производит не какоко изменеия в поведении
         } else if (input == 'a' || input == 'A') {  // left
             game.move_left(t);
         } else if (input == 'd' || input == 'D') {  // right

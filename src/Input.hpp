@@ -1,3 +1,4 @@
+#include "stucture.hpp"
 
 #pragma once
 class Input{

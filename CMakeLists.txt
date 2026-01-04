@@ -34,6 +34,7 @@ add_executable(my_game
     src/Render.cpp
     src/Input.cpp
     src/main.cpp
+    src/game_state.cpp
 )
 
 # Поиск всех .cpp и .h файлов в директории src и подкаталогах

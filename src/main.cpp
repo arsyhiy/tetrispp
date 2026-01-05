@@ -1,8 +1,6 @@
 #include "Game.hpp"
 #include "Input.hpp"
 #include "Render.hpp"
-#include "iostream"
-#include "ncurses.h"
 
 int main() {
     Game game;

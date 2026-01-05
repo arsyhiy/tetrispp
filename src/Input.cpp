@@ -1,11 +1,5 @@
 #include "Input.hpp"
 
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
-
-#include "Game.hpp"
-
 bool Input::kbhit() {
     struct termios settings;
     int stdinFlags;

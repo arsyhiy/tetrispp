@@ -1,7 +1,10 @@
 #pragma once
 
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 #include "Game.hpp"
-#include "ncurses.h"
+
 class Input {
    public:
 

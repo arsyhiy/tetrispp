@@ -1,7 +1,5 @@
 #include "Render.hpp"
 
-#include "ncurses.h"
-
 void Render::draw_interface(const Game& game) {
     mvprintw(1, 2, "Score: %d", game.score);
     mvprintw(2, 2, "Level: %d", 1);  // Пока уровень = 1

@@ -2,6 +2,7 @@
 #include "iostream"
 #include <chrono>
 #include <thread>
+#include "ncurses.h"
 
 class Game {
    public:

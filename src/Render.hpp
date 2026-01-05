@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "ncurses.h"
 
 class Render {
 public:

@@ -2,8 +2,8 @@
 
 void Render::draw_interface(const Game& game) {
     mvprintw(1, 2, "Score: %d", game.score);
-    mvprintw(2, 2, "Level: %d", 1);  // Пока уровень = 1
-    mvprintw(2, 2, "Press 'q' to quit");
+    //mvprintw(2, 2, "Level: %d", 1);  // Пока уровень = 1
+    mvprintw(2, 2, "Press 'esc' to quit");
 }
 
 void Render::draw_frame(const Game& game) {

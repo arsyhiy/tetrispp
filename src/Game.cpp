@@ -82,6 +82,7 @@ void Game::move_right(Tetromino& t) {
 };
 
 void Game::rotate(Tetromino& t) {
+  // TODO: переписать функцию так как из старых прописаных тетромино появляется новые при повороте у меня например появился + 
     int new_rotation = (t.rotation + 1) % 4;
 
     for (int ty = 0; ty < 4; ++ty) {

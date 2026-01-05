@@ -1,5 +1,6 @@
 #include "Input.hpp"
 
+
 bool Input::kbhit() {
     struct termios settings;
     int stdinFlags;

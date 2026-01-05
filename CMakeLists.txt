@@ -10,16 +10,6 @@
 # #
 # # # Создание исполнимого файла
 # # add_executable(my_game ${SOURCE_FILES})
-# #
-# # # Форматирование с помощью clang-format
-# # add_custom_target(
-# #     format
-# #     COMMAND /usr/bin/clang-format -i ${SOURCE_FILES}
-# #     COMMENT "Running clang-format..."
-# #     VERBOSE 1
-# # )
-# #
-# # # Теперь можно использовать make format
 
 # find_package(Curses REQUIRED)
 # include_directories(${CURSES_INCLUDE_DIR})
@@ -53,6 +43,7 @@
 # # Теперь можно использовать make format
 
 
+
 cmake_minimum_required(VERSION 3.10)
 project(tetrispp)
 
@@ -66,6 +57,20 @@ add_executable(tetrispp
     src/Render.cpp
     src/main.cpp
 )
+
+
+file(GLOB_RECURSE SOURCE_FILES  src/*.h src/*.cpp )
+
+# Форматирование с помощью clang-format
+add_custom_target(
+    format
+    COMMAND /usr/bin/clang-format -i ${SOURCE_FILES}
+    COMMENT "Running clang-format..."
+    VERBOSE 1
+)
+
+# Теперь можно использовать make format
+
 
 # Ищем ncurses
 find_package(Curses REQUIRED)

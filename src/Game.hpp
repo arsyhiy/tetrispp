@@ -12,16 +12,14 @@ class Game {
     static const int FIELD_W = 10;      // width
     int field[FIELD_H][FIELD_W] = {0};  // note that 0 for empty 1 for full.
 
-    // tetromino
-    // i think we need to initialize it 
     struct Tetromino {
         int type;
         int rotation;
         int x;
         int y;
+        int points;
     };
-  //Tetromino t; 
-  Tetromino t = {0, 0, FIELD_W / 2, 0};// something like that for start
+    Tetromino t;
 
     const int shapes[7][4][4][4] = {
         // I-тип
@@ -78,18 +76,21 @@ class Game {
         }};
 
 
+    int score = 0;
 
-    // score
-    int score = 0;  // intial value
+    bool check_collision(const Tetromino& t);
+    bool line_is_full(int row);
+    bool is_game_over();
 
-    bool can_move_down(const Tetromino& t);
+    Tetromino create_random_tetromino();
+
     void move_down(Tetromino& t);
-
     void move_left(Tetromino& t);
     void move_right(Tetromino& t);
     void rotate(Tetromino& t);
     void update();
     void clean_line();
-    bool line_is_full(int row);
     void clear_line(int row);
+    void spawn_new_tetromino();
+    void lock_tetromino(const Tetromino& t);
 };

@@ -48,7 +48,6 @@ void Render::draw_frame(const Game& game) {
 
 void Render::draw(const Game& game) {
     refresh();
-    sleep_ms(50);
     draw_interface(game);
     draw_frame(game);
 };

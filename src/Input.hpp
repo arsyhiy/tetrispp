@@ -7,7 +7,5 @@
 
 class Input {
    public:
-
-    bool kbhit();
-    void handle_input(Game& game);
+   void handle_input(Game& game);
 };

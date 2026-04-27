@@ -13,7 +13,7 @@ int main() {
     Render render;
 
     if (initscr() == nullptr) {
-        std::cerr << "Не удалось инициализировать ncurses\n";
+        std::cerr << "cannot initialize ncurses\n";
         return 1;
     }
 
@@ -32,7 +32,6 @@ int main() {
         auto now = std::chrono::high_resolution_clock::now();
         float delta_time = std::chrono::duration<float>(now - last_time).count();
         last_time = now;
-
         input.handle_input(game);
         game.update(delta_time);
         render.draw(game);

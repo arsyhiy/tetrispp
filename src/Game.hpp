@@ -124,6 +124,12 @@ static constexpr int shapes[7][4][4][4] = {
 
     int lock_height = 0;
                                                       
+
+    int level = 0;
+    int total_lines_cleared = 0;
+    float base_gravity = 1.0f;
+
+
     bool check_collision(const Tetromino& t);
     bool line_is_full(int row);
     bool is_game_over();

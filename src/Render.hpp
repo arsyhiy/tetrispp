@@ -1,11 +1,11 @@
 #include "Game.hpp"
 
 class Render {
-public:
-
+   public:
     void draw(const Game& game);
+
+   private:
     void draw_interface(const Game& game);
     void draw_frame(const Game& game);
-    void sleep_ms(int ms) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
+    void sleep_ms(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); };
 };

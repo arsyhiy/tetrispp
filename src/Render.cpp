@@ -1,16 +1,17 @@
 #include "Render.hpp"
 
 void Render::draw_interface(const Game& game) {
-    mvprintw(1, 2, "Score: %d", game.score);
-    // mvprintw(2, 2, "Level: %d", 1);  // Пока уровень = 1
-    mvprintw(2, 2, "Press 'esc' to quit");
+    mvprintw(1, 2, "Press 'esc' to quit");
+    mvprintw(2, 2, "Level: %d", game.level);
+    mvprintw(3, 2, "Score: %d", game.score);
+    mvprintw(4, 2, "lines cleared: %d", game.total_lines_cleared);
 }
 
 void Render::draw_frame(const Game& game) {
     for (int y = 0; y < Game::FIELD_H; ++y) {
         for (int x = 0; x < Game::FIELD_W; ++x) {
-            int screen_x = (x + Game::FIELD_W) * 2 + 5;  // right offset for the field
-            int screen_y = y + 1;  // vertical offset (to avoid drawing on the top line)
+            int screen_x = (x + Game::FIELD_W) * 2 + 5;
+            int screen_y = y + 1;
 
             if (x == 0) {
                 mvaddch(screen_y, screen_x, '<');

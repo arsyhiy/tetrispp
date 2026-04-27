@@ -12,7 +12,7 @@ class Game {
     // field
     static const int FIELD_H = 21;      // hight
     static const int FIELD_W = 12;      // width
-    int field[FIELD_H][FIELD_W] = {0};  // note that 0 for empty 1 for full.
+    int field[FIELD_H][FIELD_W] = {0};  // note that 0 for empty 1 is teromino 2 is wall or flor.
 
     struct Tetromino {
         int type;

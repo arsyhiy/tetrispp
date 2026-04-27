@@ -1,7 +1,6 @@
 #include "Game.hpp"
 
 void Game::init_field() {
-    // оказалось что это является хорошей идеей для rotate заполить края и пол значение 2
     for (int y = 0; y < FIELD_H; ++y) {
         field[y][0] = 2;
         field[y][FIELD_W - 1] = 2;
@@ -11,47 +10,36 @@ void Game::init_field() {
     }
 }
 
-
 void Game::finalize_lock() {
     lock_tetromino(t);
     int lines = clean_line();
 
-    // Устанавливаем задержку перед появлением следующей фигуры (ARE)
     entry_delay_counter = calculate_nes_are(t.y) + ((lines > 0) ? 17 + lines * 3 : 0);
-    
-    // Сбрасываем таймер падения, чтобы новая фигура не прыгнула вниз сразу
+
     fall_timer = 0;
-    
-    // Помечаем текущую фигуру как "неактивную" (можно через y = -1 или спец. флаг)
-    t.y = -1; 
+
+    t.y = -1;
 }
 
-
-
 int Game::calculate_nes_are(int lock_height) {
-    // lock_height — самая нижняя строка, которую заняла фигура (чем больше — тем ниже)
-    // В NES ARE уменьшается с ростом высоты фиксации
 
     if (lock_height >= 16)
-        return 10;  // самые нижние позиции
+        return 10;
     if (lock_height >= 12)
         return 12;
     if (lock_height >= 8)
         return 14;
     if (lock_height >= 4)
         return 16;
-    return 18;  // самые верхние (lock_height ≈ 0–3)
+    return 18;
 }
 
-
-
 bool Game::check_collision(const Tetromino& t) {
-
     for (int ty = 0; ty < 4; ++ty) {
         for (int tx = 0; tx < 4; ++tx) {
             if (shapes[t.type][t.rotation][ty][tx]) {
                 int world_x = t.x + tx;
-                int world_y = t.y + ty; //+ 1;
+                int world_y = t.y + ty;  //+ 1;
                 if (world_y >= FIELD_H - 1 ||
                     (world_x >= 1 && world_x < FIELD_W - 1 && field[world_y][world_x])) {
                     return false;
@@ -64,9 +52,7 @@ bool Game::check_collision(const Tetromino& t) {
     return true;
 };
 
-
 void Game::lock_tetromino(const Tetromino& t) {
-    
     for (int ty = 0; ty < 4; ++ty) {
         for (int tx = 0; tx < 4; ++tx) {
             if (shapes[t.type][t.rotation][ty][tx]) {
@@ -79,22 +65,13 @@ void Game::lock_tetromino(const Tetromino& t) {
         }
     }
 
-    //clean_line();
 };
 
-// void Game::move_down(Tetromino& t) {
-//     if (check_collision(t)) {
-//         t.y++;
-//     } else {
-//         lock_tetromino(t);
-//         // if we can move down lock in
-//         t.y = -1;
-//     }
-// };
 
 void Game::move_down(Tetromino& t) {
     // Если мы уже в режиме паузы (ARE), игнорируем ввод
-    if (entry_delay_counter > 0) return;
+    if (entry_delay_counter > 0)
+        return;
 
     Tetromino temp = t;
     temp.y++;
@@ -102,10 +79,9 @@ void Game::move_down(Tetromino& t) {
     if (check_collision(temp)) {
         t.y++;
     } else {
-        finalize_lock(); // Используем общий метод
+        finalize_lock();  // Используем общий метод
     }
 }
-
 
 void Game::move_left(Tetromino& t) {
     for (int ty = 0; ty < 4; ++ty) {
@@ -244,21 +220,21 @@ int Game::clean_line() {
 }
 
 namespace {
-    std::mt19937& global_rng() {
-        static std::mt19937 rng(std::random_device{}());
-        return rng;
-    }
-
-    constexpr int points_table[7] = {
-        100, // I
-        200, // J
-        300, // L
-        150, // O
-        250, // S
-        200, // T
-        300  // Z
-    };
+std::mt19937& global_rng() {
+    static std::mt19937 rng(std::random_device{}());
+    return rng;
 }
+
+constexpr int points_table[7] = {
+    100,  // I
+    200,  // J
+    300,  // L
+    150,  // O
+    250,  // S
+    200,  // T
+    300   // Z
+};
+}  // namespace
 
 void Game::refill_bag() {
     bag = {0, 1, 2, 3, 4, 5, 6};
@@ -283,23 +259,18 @@ Game::Tetromino Game::create_random_tetromino() {
     return t;
 }
 
-void Game::spawn_new_tetromino() {
-    t = create_random_tetromino();
-
-}
+void Game::spawn_new_tetromino() { t = create_random_tetromino(); }
 
 bool Game::is_game_over() {
     for (int x = 0; x < FIELD_W; ++x) {
-        if (field[0][x] != 0 && field[0][x] != 2)  {
+        if (field[0][x] != 0 && field[0][x] != 2) {
             return true;
         }
     }
     return false;
 };
 
-
 void Game::update(float delta_time) {
-
     if (is_game_over()) {
         is_running = false;
         return;
@@ -347,18 +318,16 @@ void Game::update(float delta_time) {
 
         if (check_collision(temp)) {
             t.y++;
-        }else {
-          t.y++;
-          finalize_lock(); // Используем тот же общий метод  
-    //lock_tetromino(t);
+        } else {
+            //t.y++;
+            finalize_lock();  // Используем тот же общий метод
+            // lock_tetromino(t);
 
-    int lines = clean_line();
+            int lines = clean_line();
 
-    entry_delay_counter =
-        calculate_nes_are(t.y)
-        + ((lines > 0) ? 17 + lines * 3 : 0);
+            entry_delay_counter = calculate_nes_are(t.y) + ((lines > 0) ? 17 + lines * 3 : 0);
 
-    return;   // важно выйти, чтобы не продолжать цикл
-}
+            return;  // важно выйти, чтобы не продолжать цикл
+        }
     }
 }

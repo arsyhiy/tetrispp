@@ -1,9 +1,11 @@
+#include <ncurses.h>
+
+#include <chrono>
+#include <iostream>
+
 #include "Game.hpp"
 #include "Input.hpp"
 #include "Render.hpp"
-#include <chrono>
-#include <ncurses.h>
-#include <iostream>
 
 int main() {
     Game game;
@@ -28,8 +30,7 @@ int main() {
 
     while (game.is_running) {
         auto now = std::chrono::high_resolution_clock::now();
-        float delta_time =
-            std::chrono::duration<float>(now - last_time).count();
+        float delta_time = std::chrono::duration<float>(now - last_time).count();
         last_time = now;
 
         input.handle_input(game);

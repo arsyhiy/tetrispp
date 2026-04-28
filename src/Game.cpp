@@ -3,16 +3,28 @@
 void Game::init_field() {
     for (int y = 0; y < FIELD_H; ++y) {
         for (int x = 0; x < FIELD_W; ++x) {
+            // if (x == 0 || x == FIELD_W - 1 || y == FIELD_H - 1) {
+            field[y][x] = 0;  // ← ВАЖНО
+
             if (x == 0 || x == FIELD_W - 1 || y == FIELD_H - 1) {
                 field[y][x] = 2;
-            }
+            }  //     field[y][x] = 2;
         }
     }
 }
 
 void Game::finalize_lock() {
     lock_tetromino(t);
-    int lines = clean_line();
+    // int lines = clean_line();
+    // last_cleared_lines = clean_line();
+    // int lines = last_cleared_lines;
+    last_cleared_lines = clean_line();
+    total_lines_cleared += last_cleared_lines;
+
+    int lines = last_cleared_lines;
+
+    level = total_lines_cleared / 10;
+    current_gravity = base_gravity + level * 0.5f;
 
     entry_delay_counter = calculate_nes_are(t.y) + ((lines > 0) ? 17 + lines * 3 : 0);
 
@@ -242,7 +254,8 @@ int Game::clean_line() {
         800   // 4 lines (tetris)
     };
 
-    score += score_table[cleared];
+    // score += score_table[cleared];
+    score += score_table[std::min(cleared, 4)];
 
     return cleared;
 }
@@ -338,11 +351,9 @@ void Game::update(float delta_time) {
         } else {
             finalize_lock();
 
-            int lines = clean_line();
-            total_lines_cleared += lines;
-
-            // уровень: каждые 10 линий
-            level = total_lines_cleared / 10;
+            // int lines = clean_line();
+            // lines уже должен приходить из finalize_lock (см. ниже)
+            // total_lines_cleared += last_cleared_lines;
 
             // ускорение
             current_gravity = base_gravity + level * 0.5f;

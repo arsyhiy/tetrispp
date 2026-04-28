@@ -5,7 +5,7 @@ void Render::draw_interface(const Game& game) {
     mvprintw(2, 2, "Level: %d", game.level);
     mvprintw(3, 2, "Score: %d", game.score);
     mvprintw(4, 2, "lines cleared: %d", game.total_lines_cleared);
-}
+};
 
 void Render::draw_frame(const Game& game) {
     for (int y = 0; y < Game::FIELD_H; ++y) {

@@ -3,21 +3,18 @@
 void Game::init_field() {
     for (int y = 0; y < FIELD_H; ++y) {
         for (int x = 0; x < FIELD_W; ++x) {
-            // if (x == 0 || x == FIELD_W - 1 || y == FIELD_H - 1) {
-            field[y][x] = 0;  // ← ВАЖНО
+            field[y][x] = 0;
 
             if (x == 0 || x == FIELD_W - 1 || y == FIELD_H - 1) {
                 field[y][x] = 2;
-            }  //     field[y][x] = 2;
+            }
         }
     }
 }
 
 void Game::finalize_lock() {
     lock_tetromino(t);
-    // int lines = clean_line();
-    // last_cleared_lines = clean_line();
-    // int lines = last_cleared_lines;
+
     last_cleared_lines = clean_line();
     total_lines_cleared += last_cleared_lines;
 
@@ -60,21 +57,6 @@ bool Game::check_collision(const Tetromino& t) {
     }
     return true;
 };
-
-// void Game::lock_tetromino(const Tetromino& t) {
-//     for (int ty = 0; ty < 4; ++ty) {
-//         for (int tx = 0; tx < 4; ++tx) {
-//             if (shapes[t.type][t.rotation][ty][tx]) {
-//                 int world_x = t.x + tx;
-//                 int world_y = t.y + ty;
-//                 if (world_y < FIELD_H - 1) {
-//                     field[world_y][world_x] = 1;
-//                 }
-//             }
-//         }
-//     }
-//
-// };
 
 void Game::lock_tetromino(const Tetromino& t) {
     for (int ty = 0; ty < 4; ++ty) {
@@ -147,8 +129,6 @@ bool Game::is_valid_position(const Tetromino& tet) const {
                 int wx = tet.x + tx;
                 int wy = tet.y + ty;
 
-                // if (wx < 0 || wx >= FIELD_W -1 || wy < 0 || wy >= FIELD_H -1 || field[wy][wx] !=
-                // 0) {
                 if (wx <= 0 || wx >= FIELD_W - 1 || wy >= FIELD_H - 1) {
                     return false;
                 }
@@ -169,16 +149,7 @@ bool Game::rotate(Tetromino& t) {
         return true;
     }
 
-    // Таблица простых kick-отскоков (пробуем по порядку)
-    // Порядок: влево, вправо, вверх, вниз (можно добавить больше)
-    static const std::pair<int, int> kicks[] = {
-        {-1, 0},  // влево
-        {1, 0},   // вправо
-        {0, -1},  // вверх
-        {0, 1},   // вниз
-        {-2, 0},  // влево на 2 (для I-фигуры полезно)
-        {2, 0}    // вправо на 2
-    };
+    static const std::pair<int, int> kicks[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-2, 0}, {2, 0}};
 
     for (const auto& kick : kicks) {
         Tetromino kicked = t;
@@ -218,23 +189,6 @@ void Game::clear_line(int row) {
     }
 };
 
-// int Game::clean_line() {
-//     int cleared = 0;
-//
-//     for (int i = FIELD_H - 2; i >= 1; --i) {
-//         if (line_is_full(i)) {
-//             clear_line(i);
-//             cleared++;
-//
-//             int points_per_line[] = {0, 40, 100, 300, 1200};
-//             score += points_per_line[cleared] * (1 + 1);
-//
-//         }
-//     }
-//
-//     return cleared;
-// }
-
 int Game::clean_line() {
     int cleared = 0;
 
@@ -242,30 +196,21 @@ int Game::clean_line() {
         if (line_is_full(i)) {
             clear_line(i);
             cleared++;
-            i++;  // важно: перепроверяем строку после сдвига
+            i++;
         }
     }
 
-    static const int score_table[5] = {
-        0,    // 0 lines
-        100,  // 1 line
-        300,  // 2 lines
-        500,  // 3 lines
-        800   // 4 lines (tetris)
-    };
+    static const int score_table[5] = {0, 100, 300, 500, 800};
 
-    // score += score_table[cleared];
     score += score_table[std::min(cleared, 4)];
 
     return cleared;
 }
 
-// локальный (виден только в этом .cpp файле)
 static std::mt19937 rng(std::random_device{}());
 
 std::mt19937& global_rng() { return rng; }
 
-// таблица очков (просто статический массив)
 static const int points_table[7] = {
     100,  // I
     200,  // J
@@ -351,14 +296,8 @@ void Game::update(float delta_time) {
         } else {
             finalize_lock();
 
-            // int lines = clean_line();
-            // lines уже должен приходить из finalize_lock (см. ниже)
-            // total_lines_cleared += last_cleared_lines;
-
-            // ускорение
             current_gravity = base_gravity + level * 0.5f;
 
-            // entry_delay_counter = calculate_nes_are(t.y) + ((lines > 0) ? 17 + lines * 3 : 0);
             int lock_height = t.y;
 
             return;

@@ -34,7 +34,7 @@ void Render::draw_frame(const Game& game) {
 
     for (int ty = 0; ty < 4; ++ty) {
         for (int tx = 0; tx < 4; ++tx) {
-            if (game.shapes[game.t.type][game.t.rotation][ty][tx]) {
+            if (Game::shapes[game.t.type][game.t.rotation][ty][tx]){
                 int world_x = game.t.x + tx;
                 int world_y = game.t.y + ty;
 

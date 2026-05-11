@@ -24,7 +24,8 @@ class Game {
     };
     Tetromino t;
 
-    static constexpr int shapes[7][4][4][4] = {
+    // static constexpr int shapes[7][4][4][4] = {
+    inline static constexpr int shapes[7][4][4][4] = {
         {{{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}},
          {{0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}},
          {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}},
